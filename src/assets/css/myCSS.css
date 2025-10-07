@@ -1,0 +1,202 @@
+/* 基础样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  font-size: 16px;
+}
+
+body {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* 主背景样式 - 绿色渐变效果 */
+.bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f0f9e8 0%, #e0f2d9 50%, #d0e9c9 100%);
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* 添加装饰性元素 */
+.bg::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(#a6d96a 1px, transparent 1px),
+    radial-gradient(#a6d96a 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: 0 0, 25px 25px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 卡片样式 - 用于表单和内容区域 */
+.farm-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.farm-card:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+/* 按钮基础样式 */
+.farm-btn {
+  border-radius: 25px;
+  padding: 10px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 主要按钮 - 绿色主题 */
+.farm-btn-primary {
+  background: linear-gradient(45deg, #4caf50 0%, #45a049 100%);
+  color: white;
+}
+
+.farm-btn-primary:hover {
+  background: linear-gradient(45deg, #45a049 0%, #3d8b40 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.farm-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* 辅助按钮 */
+.farm-btn-secondary {
+  background: linear-gradient(45deg, #81c784 0%, #66bb6a 100%);
+  color: white;
+}
+
+.farm-btn-secondary:hover {
+  background: linear-gradient(45deg, #66bb6a 0%, #5cb85c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(129, 199, 132, 0.3);
+}
+
+/* 输入框样式 */
+.farm-input {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 100%;
+  margin: 0;
+  display: block;
+}
+
+.farm-input:focus {
+  border-color: #4caf50;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  background-color: white;
+  transform: translateY(-1px);
+}
+
+/* 标签样式优化 */
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+/* 表单组样式 - 确保对齐 */
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+/* 确保标签和输入框垂直对齐 */
+.form-group label {
+  vertical-align: middle;
+}
+
+.form-group input {
+  vertical-align: middle;
+}
+
+/* 链接样式 */
+.farm-link {
+  color: #4caf50;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.farm-link:hover {
+  color: #3d8b40;
+  text-decoration: underline;
+}
+
+/* 标题样式 */
+.farm-title {
+  color: #2e7d32;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+}
+
+.farm-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #4caf50 0%, #81c784 100%);
+  border-radius: 2px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .farm-btn {
+    padding: 8px 20px;
+  }
+  
+  .farm-title::after {
+    width: 40px;
+    bottom: -6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bg::before {
+    background-size: 30px 30px;
+    background-position: 0 0, 15px 15px;
+  }
+}
