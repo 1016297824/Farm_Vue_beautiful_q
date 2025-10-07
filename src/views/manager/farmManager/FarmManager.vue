@@ -15,8 +15,7 @@
 export default {
   name: "FarmManager",
   components: {
-    farmManagerNavbar: () =>
-      import("@/components/Header/FarmManagerNavbar"),
+    farmManagerNavbar: () => import("@/components/Header/FarmManagerNavbar"),
     footerNavbar: () => import("@/components/FooterNavbar")
   }
 };

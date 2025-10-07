@@ -1,53 +1,54 @@
-// 餐厅物资
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="col-lg-12">
-          <div class="col-lg-8 m-auto">
-            <br />
-            <br />
-            <br />
-            <form action="">
-              <div class="form-group text-left">
-                <div class="row">
-                  <div class="col-lg-12">
-                    <div class="row">
-                      <div class="col-lg-2">
-                        <label for="" class="font-weight-bold">餐厅物资</label>
-                      </div>
-                      <div class="col-lg-3"></div>
-                      <div class="col-lg-7">
-                        <input
-                          type="button"
-                          class="btn btn-primary"
-                          style="float:right"
-                          value="新建采购信息"
-                          data-toggle="modal"
-                          data-target="#addRestaurantMaterial"
-                          @click="addRestaurantMaterial"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+  <div>
+    <!-- 导航栏 -->
+    <farmStaffNavbar />
+
+    <!-- 主体内容 -->
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
+      <div class="row justify-content-center">
+        <div class="col-xl-12">
+          <div class="card-farm p-4">
+            <!-- 页面标题 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h2 class="farm-title mb-2">
+                  <i class="bi bi-basket me-2"></i>餐厅物资管理
+                </h2>
+                <p class="text-muted mb-0">
+                  管理餐厅物资的库存、采购和使用记录
+                </p>
               </div>
-              <hr />
-              <br />
-              <table class="table table-borderless">
+              <button
+                type="button"
+                class="btn btn-farm-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#addRestaurantMaterialModal"
+                @click="addRestaurantMaterial"
+              >
+                <i class="bi bi-plus-circle me-2"></i>新建采购信息
+              </button>
+            </div>
+
+            <!-- 物资表格 -->
+            <div class="table-responsive">
+              <table class="table table-farm">
                 <thead>
                   <tr>
-                    <th style="text-align: center;" class="text-truncate">
-                      物资名
+                    <th class="text-center">
+                      <i class="bi bi-tag me-1"></i>物资名
                     </th>
-                    <th style="text-align: center;" class="text-truncate">
-                      库存
+                    <th class="text-center">
+                      <i class="bi bi-box me-1"></i>当前库存
                     </th>
-                    <th style="text-align: center;" class="text-truncate">
-                      安全库存
+                    <th class="text-center">
+                      <i class="bi bi-shield-check me-1"></i>安全库存
                     </th>
-                    <th style="text-align: center;" class="text-truncate"></th>
-                    <th style="text-align: center;" class="text-truncate"></th>
+                    <th class="text-center">
+                      <i class="bi bi-exclamation-triangle me-1"></i>库存状态
+                    </th>
+                    <th class="text-center">
+                      <i class="bi bi-gear me-1"></i>操作
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -55,824 +56,334 @@
                     v-for="(restaurantMaterial,
                     index) in restaurantMaterialList"
                     :key="index"
+                    class="table-row-hover"
                   >
-                    <td style="text-align: center;" class="text-truncate">
+                    <td class="text-center fw-bold text-farm-primary">
                       {{ restaurantMaterial.name }}
                     </td>
-                    <td style="text-align: center;" class="text-truncate">
-                      {{ restaurantMaterial.amount + restaurantMaterial.unit }}
+                    <td class="text-center">
+                      <span class="inventory-amount">
+                        {{ restaurantMaterial.amount
+                        }}{{ restaurantMaterial.unit }}
+                      </span>
                     </td>
-                    <td style="text-align: center;" class="text-truncate">
-                      {{
-                        restaurantMaterial.safeAmount + restaurantMaterial.unit
-                      }}
+                    <td class="text-center">
+                      <span class="safe-amount">
+                        {{ restaurantMaterial.safeAmount
+                        }}{{ restaurantMaterial.unit }}
+                      </span>
                     </td>
-                    <td
-                      style="text-align: center;color:red"
-                      class="text-truncate"
-                    >
-                      {{
-                        restaurantMaterial.amount >
-                        restaurantMaterial.safeAmount
-                          ? null
-                          : "缺货"
-                      }}
-                    </td>
-                    <td>
-                      <input
-                        type="button"
-                        value="采购"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#addRestaurantMaterialPurchase"
-                        @click="
-                          addRestaurantMaterialPurchase(restaurantMaterial)
+                    <td class="text-center">
+                      <span
+                        v-if="
+                          restaurantMaterial.amount <=
+                            restaurantMaterial.safeAmount
                         "
-                      />
-                      {{ &nbsp; }}
-                      <input
-                        type="button"
-                        value="异常消耗"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#consumptionRestaurantMaterial"
-                        @click="
-                          abnormalConsumptionRestaurantMaterial(
-                            restaurantMaterial
-                          )
-                        "
-                      />{{ &nbsp; }}
-                      <input
-                        type="button"
-                        value="使用"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#UseRestaurantMaterial"
-                        @click="UseRestaurantMaterial(restaurantMaterial)"
-                      />{{ &nbsp; }}
-                      <input
-                        type="button"
-                        value="删除"
-                        class="btn btn-light"
-                        @click="deleteRestaurantMaterial(restaurantMaterial)"
-                      />
+                        class="badge bg-danger"
+                      >
+                        <i class="bi bi-exclamation-triangle me-1"></i>库存不足
+                      </span>
+                      <span v-else class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>库存充足
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <div class="btn-group-vertical btn-group-sm" role="group">
+                        <button
+                          type="button"
+                          class="btn btn-farm-primary btn-sm mb-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#purchaseModal"
+                          @click="
+                            addRestaurantMaterialPurchase(restaurantMaterial)
+                          "
+                        >
+                          <i class="bi bi-cart-plus me-1"></i>采购
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-warning btn-sm mb-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#consumptionModal"
+                          @click="
+                            abnormalConsumptionRestaurantMaterial(
+                              restaurantMaterial
+                            )
+                          "
+                        >
+                          <i class="bi bi-exclamation-circle me-1"></i>异常消耗
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-farm-success btn-sm mb-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#useModal"
+                          @click="UseRestaurantMaterial(restaurantMaterial)"
+                        >
+                          <i class="bi bi-check-square me-1"></i>使用
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-danger btn-sm"
+                          @click="deleteRestaurantMaterial(restaurantMaterial)"
+                        >
+                          <i class="bi bi-trash me-1"></i>删除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="restaurantMaterialList.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4">
+                      <i class="bi bi-basket me-2"></i>暂无餐厅物资数据
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <nav aria-label="Page navigation">
-                <ul class="pagination">
-                  <li class="page-item">
-                    <a
+            </div>
+
+            <!-- 分页器 -->
+            <div
+              class="d-flex justify-content-center"
+              v-if="pageBody1.pageList && pageBody1.pageList.length > 1"
+            >
+              <nav aria-label="餐厅物资分页">
+                <ul class="pagination pagination-farm">
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === 1 }"
+                  >
+                    <button
+                      type="button"
                       class="page-link"
-                      href="#"
-                      aria-label="Previous"
                       @click="doPage2(1)"
+                      :disabled="pageBody1.page === 1"
                     >
-                      <span aria-hidden="true">&laquo;</span>
-                      <span class="sr-only">Previous</span>
-                    </a>
+                      <i class="bi bi-chevron-double-left"></i>
+                    </button>
                   </li>
                   <li
                     v-for="(page, index) in pageBody1.pageList"
                     :key="index"
-                    :class="
-                      pageBody1.page == page ? 'page-item active' : 'page-item'
-                    "
+                    class="page-item"
+                    :class="{ active: pageBody1.page === page }"
                   >
-                    <a class="page-link" href="#" @click="doPage2(page)">
-                      {{ page }}
-                    </a>
-                  </li>
-                  <li class="page-item">
-                    <a
+                    <button
+                      type="button"
                       class="page-link"
-                      href="#"
-                      aria-label="Next"
-                      @click="doPage2(pageBody1.pages)"
+                      @click="doPage2(page)"
                     >
-                      <span aria-hidden="true">&raquo;</span>
-                      <span class="sr-only">Next</span>
-                    </a>
+                      {{ page }}
+                    </button>
+                  </li>
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === pageBody1.pages }"
+                  >
+                    <button
+                      type="button"
+                      class="page-link"
+                      @click="doPage2(pageBody1.pages)"
+                      :disabled="pageBody1.page === pageBody1.pages"
+                    >
+                      <i class="bi bi-chevron-double-right"></i>
+                    </button>
                   </li>
                 </ul>
               </nav>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- model -->
+    <!-- 采购模态框 -->
     <div
       class="modal fade"
-      id="addRestaurantMaterialPurchase"
+      id="purchaseModal"
       tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
+      aria-labelledby="purchaseModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-farm">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              物资采购
+            <h5 class="modal-title" id="purchaseModalLabel">
+              <i class="bi bi-cart-plus me-2"></i>物资采购
             </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            物资名
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.name"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            采购数量
-                          </span>
-                        </div>
-                        <input
-                          v-model="purchase.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite()"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.unit"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单价
-                          </span>
-                        </div>
-                        <input
-                          v-model="purchase.price"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="priceWrite"
-                        />
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            元
-                          </span>
-                        </div>
-                      </div>
-                      <p style="color: red;">
-                        {{ priceMessage }}
-                      </p>
-                      <br />
-                    </div>
-                  </div>
+            <div class="purchase-form">
+              <div class="mb-3">
+                <label class="form-label-farm">物资名称：</label>
+                <input
+                  type="text"
+                  class="form-control form-control-farm"
+                  v-model="purchase.restaurantMaterial.name"
+                  readonly
+                />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label-farm">采购数量：</label>
+                  <input
+                    type="number"
+                    class="form-control form-control-farm"
+                    v-model="purchase.amount"
+                    min="1"
+                  />
                 </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label-farm">单价：</label>
+                  <input
+                    type="number"
+                    class="form-control form-control-farm"
+                    v-model="purchase.price"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label-farm">供应商：</label>
+                <input
+                  type="text"
+                  class="form-control form-control-farm"
+                  v-model="purchase.supplier"
+                />
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="addRestaurantMaterialPurchaseModel"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- model -->
-    <div
-      class="modal fade"
-      id="consumptionRestaurantMaterial"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              物资消耗
-            </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
             >
-              <span aria-hidden="true">&times;</span>
+              <i class="bi bi-x-circle me-2"></i>取消
             </button>
-          </div>
-          <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            物资名
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.name"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            异常消耗数量
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.unit"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="consumptionRestaurantMaterialModel"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- model -->
-    <div
-      class="modal fade"
-      id="UseRestaurantMaterial"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              物资使用
-            </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
+              class="btn btn-farm-primary"
+              @click="addPurchaseData"
             >
-              <span aria-hidden="true">&times;</span>
+              <i class="bi bi-check-circle me-2"></i>确认采购
             </button>
-          </div>
-          <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            物资名
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.name"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            使用数量
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.unit"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="UseRestaurantMaterialModel"
-              />
-            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- model -->
-    <div
-      class="modal fade"
-      id="addRestaurantMaterial"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              新建采购信息
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            物资名
-                          </span>
-                        </div>
-                        <input
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          v-model="restaurantMaterial.name"
-                          @keyup="nameWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ nameMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            库存
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            安全库存
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.safeAmount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="safeAmountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ safeAmountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="restaurantMaterial.unit"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="unitWtite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ unitMessge }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="addRestaurantMaterialModel"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <br />
-    <br />
-    <br />
+    <!-- 页脚 -->
+    <footerNavbar />
   </div>
 </template>
 
 <script>
-import $ from "jquery";
 import bus from "@/util/Bus";
 import {
-  addRestaurantMaterial,
   initRestaurantMaterial,
   doPage2,
-  addRestaurantMaterialPurchase,
   deleteRestaurantMaterial,
-  consumptionRestaurantMaterial,
-  useRestaurantMaterial
-} from "@/api/farmStaff.js";
+  addRestaurantMaterialPurchase as addPurchaseData
+} from "@/api/farmStaff";
+import farmStaffNavbar from "@/components/Header/FarmStaffNavbar.vue";
+import footerNavbar from "@/components/FooterNavbar.vue";
 
 export default {
   name: "RestaurantMaterial",
-  data: () => ({
-    restaurantMaterial: {
-      id: null,
-      name: null,
-      amount: null,
-      safeAmount: null,
-      unit: null
-    },
-    restaurantMaterialList: [],
-    pageBody1: {
-      page: null,
-      pages: null,
-      pageList: []
-    },
-    purchase: {
-      amount: null,
-      price: null,
-      restaurantMaterial: null
-    },
-    nowAmount: null,
-    nameMessage: null,
-    amountMessage: null,
-    safeAmountMessage: null,
-    unitMessge: null,
-    priceMessage: null
-  }),
+  components: {
+    farmStaffNavbar,
+    footerNavbar
+  },
+  data() {
+    return {
+      restaurantMaterialList: [],
+      pageBody1: {
+        page: 1,
+        pages: 1,
+        pageList: []
+      },
+      restaurantMaterial: {
+        id: null,
+        name: null,
+        amount: null,
+        unit: null,
+        safeAmount: null
+      },
+      purchase: {
+        id: null,
+        amount: null,
+        price: null,
+        supplier: null,
+        restaurantMaterial: {
+          id: null,
+          name: null
+        }
+      }
+    };
+  },
   methods: {
-    nameWrite() {
-      this.nameMessage = null;
-    },
-    amountWrite() {
-      this.amountMessage = null;
-    },
-    safeAmountWrite() {
-      this.safeAmountMessage = null;
-    },
-    unitWtite() {
-      this.unitMessge = null;
-    },
-    priceWrite() {
-      this.priceMessage = null;
-    },
     doPage2(page) {
-      this.pageBody1.page = page;
-      doPage2(this.pageBody1);
+      doPage2(page);
     },
     addRestaurantMaterial() {
-      this.restaurantMaterial.id = null;
-      this.restaurantMaterial.name = null;
-      this.restaurantMaterial.amount = null;
-      this.restaurantMaterial.safeAmount = null;
-      this.restaurantMaterial.unit = null;
-      this.nameMessage = null;
-      this.amountMessage = null;
-      this.safeAmountMessage = null;
-      this.unitMessge = null;
-    },
-    addRestaurantMaterialModel() {
-      if (
-        this.restaurantMaterial.name == null ||
-        this.restaurantMaterial.amount == null ||
-        this.restaurantMaterial.safeAmount == null ||
-        this.restaurantMaterial.unit == null
-      ) {
-        if (this.restaurantMaterial.name == null) {
-          this.nameMessage = "请输入名称！";
-        }
-        if (this.restaurantMaterial.amount == null) {
-          this.amountMessage = "请输入库存！";
-        }
-        if (this.restaurantMaterial.safeAmount == null) {
-          this.safeAmountMessage = "请输入安全库存！";
-        }
-        if (this.restaurantMaterial.unit == null) {
-          this.unitMessge = "请输入单位！";
-        }
-      } else {
-        let cn = /^[\u4E00-\u9FA5]+$/;
-        let re = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (
-          !cn.test(this.restaurantMaterial.name) ||
-          !cn.test(this.restaurantMaterial.unit) ||
-          !re.test(this.restaurantMaterial.amount) ||
-          !re.test(this.restaurantMaterial.safeAmount)
-        ) {
-          if (!cn.test(this.restaurantMaterial.name)) {
-            console.log(this.restaurantMaterial.name);
-
-            this.nameMessage = "请输入中文！";
-          }
-          if (!cn.test(this.restaurantMaterial.unit)) {
-            this.unitMessge = "请输入中文！";
-          }
-          if (!re.test(this.restaurantMaterial.amount)) {
-            this.amountMessage = "请输入正数（最高小数点后两位）！";
-          }
-          if (!re.test(this.restaurantMaterial.safeAmount)) {
-            this.safeAmountMessage = "请输入正数（最高小数点后两位）！";
-          }
-        } else {
-          addRestaurantMaterial(this.restaurantMaterial);
-          $("#addRestaurantMaterial").modal("hide");
-        }
-      }
+      this.restaurantMaterial = {
+        id: null,
+        name: null,
+        amount: null,
+        unit: null,
+        safeAmount: null
+      };
     },
     addRestaurantMaterialPurchase(restaurantMaterial) {
-      this.amountMessage = null;
-      this.priceMessage = null;
       this.restaurantMaterial = JSON.parse(JSON.stringify(restaurantMaterial));
-      this.purchase.price = null;
-      this.purchase.amount = null;
-    },
-    addRestaurantMaterialPurchaseModel() {
-      if ((this.purchase.amount == null) | (this.purchase.price == null)) {
-        if (this.purchase.amount == null) {
-          this.amountMessage = "请输入采购数量！";
+      this.purchase = {
+        id: null,
+        amount: null,
+        price: null,
+        supplier: null,
+        restaurantMaterial: {
+          id: restaurantMaterial.id,
+          name: restaurantMaterial.name
         }
-        if (this.purchase.price == null) {
-          this.priceMessage = "请输入采购单价！";
-        }
-      } else {
-        let p = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (!p.test(this.purchase.amount) | !p.test(this.purchase.price)) {
-          if (!p.test(this.purchase.amount)) {
-            this.amountMessage = "请输入正数（最高小数点后两位）！";
-          }
-          if (!p.test(this.purchase.price)) {
-            this.priceMessage = "请输入正数（最高小数点后两位）！";
-          }
-        } else {
-          this.purchase.restaurantMaterial = this.restaurantMaterial;
-          addRestaurantMaterialPurchase(this.purchase);
-          $("#addRestaurantMaterialPurchase").modal("hide");
-        }
-      }
+      };
     },
     deleteRestaurantMaterial(restaurantMaterial) {
-      let con = confirm(`是否删除：${restaurantMaterial.name}？`);
-      if (con == true) {
-        deleteRestaurantMaterial(restaurantMaterial);
+      if (confirm(`确定要删除 ${restaurantMaterial.name} 吗？`)) {
+        deleteRestaurantMaterial(restaurantMaterial.id);
       }
     },
     abnormalConsumptionRestaurantMaterial(restaurantMaterial) {
-      this.nowAmount = restaurantMaterial.amount;
-      this.amountMessage = null;
       this.restaurantMaterial = JSON.parse(JSON.stringify(restaurantMaterial));
-      this.restaurantMaterial.amount = null;
-    },
-    consumptionRestaurantMaterialModel() {
-      if (this.restaurantMaterial.amount == null) {
-        this.amountMessage = "请输入消耗数量！";
-      } else {
-        let p = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (!p.test(this.restaurantMaterial.amount)) {
-          this.amountMessage = "请输入正数（最高小数点后两位）！";
-        } else if (this.restaurantMaterial.amount > this.nowAmount) {
-          console.log(this.restaurantMaterial.amount + "/" + this.nowAmount);
-
-          this.amountMessage = "库存不足";
-        } else {
-          consumptionRestaurantMaterial(this.restaurantMaterial);
-          $("#consumptionRestaurantMaterial").modal("hide");
-        }
-      }
     },
     UseRestaurantMaterial(restaurantMaterial) {
-      this.nowAmount = restaurantMaterial.amount;
-      this.amountMessage = null;
       this.restaurantMaterial = JSON.parse(JSON.stringify(restaurantMaterial));
-      this.restaurantMaterial.amount = null;
     },
-    UseRestaurantMaterialModel() {
-      if (this.restaurantMaterial.amount == null) {
-        this.amountMessage = "请输入消耗数量！";
+    addPurchaseData() {
+      if (this.purchase.amount && this.purchase.price) {
+        addPurchaseData(this.purchase);
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("purchaseModal")
+        );
+        if (modal) modal.hide();
       } else {
-        let p = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (!p.test(this.restaurantMaterial.amount)) {
-          this.amountMessage = "请输入正数（最高小数点后两位）！";
-        } else if (this.restaurantMaterial.amount > this.nowAmount) {
-          this.amountMessage = "库存不足";
-        } else {
-          useRestaurantMaterial(this.restaurantMaterial);
-          $("#UseRestaurantMaterial").modal("hide");
-        }
+        alert("请填写完整的采购信息");
       }
     }
   },
   created() {
     initRestaurantMaterial();
+
     bus.$on(bus.restaurantMaterialList, data => {
-      this.restaurantMaterialList = data;
+      this.restaurantMaterialList = data || [];
     });
     bus.$on(bus.pageBody1, data => {
-      this.pageBody1 = data;
+      this.pageBody1 = data || { page: 1, pages: 1, pageList: [] };
     });
   },
   beforeDestroy() {
@@ -881,3 +392,74 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.form-label-farm {
+  font-weight: 600;
+  color: var(--farm-green-dark);
+  margin-bottom: 0.5rem;
+}
+
+.form-control-farm {
+  border: 2px solid var(--farm-border-light);
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control-farm:focus {
+  border-color: var(--farm-green);
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.table-farm thead {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.table-row-hover:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.05),
+    rgba(129, 199, 132, 0.05)
+  );
+}
+
+.inventory-amount,
+.safe-amount {
+  font-weight: 600;
+  color: var(--farm-green-dark);
+}
+
+.btn-group-vertical .btn {
+  min-width: 100px;
+}
+
+.modal-farm .modal-header {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.pagination-farm {
+  --bs-pagination-color: var(--farm-green-dark);
+  --bs-pagination-border-color: var(--farm-border-light);
+  --bs-pagination-hover-color: white;
+  --bs-pagination-hover-bg: var(--farm-green);
+  --bs-pagination-active-bg: var(--farm-green-dark);
+}
+
+@media (max-width: 768px) {
+  .btn-group-vertical .btn {
+    min-width: 80px;
+    font-size: 0.8rem;
+  }
+}
+</style>

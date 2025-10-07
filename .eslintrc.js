@@ -1,7 +1,11 @@
 module.exports = {
   root: true,
   env: {
-    node: true
+    node: true,
+    browser: true
+  },
+  globals: {
+    bootstrap: "readonly"
   },
   extends: ["plugin:vue/essential", "@vue/prettier"],
   rules: {

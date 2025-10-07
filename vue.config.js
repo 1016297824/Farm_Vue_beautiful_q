@@ -15,5 +15,15 @@ module.exports = {
       }
     }
   },
-  productionSourceMap: false
+  productionSourceMap: false,
+  css: {
+    loaderOptions: {
+      sass: {
+        sassOptions: {
+          quietDeps: true,
+          silenceDeprecations: ['legacy-js-api']
+        }
+      }
+    }
+  }
 };

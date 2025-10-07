@@ -78,9 +78,11 @@ export function addOrdering(no, orderingList) {
 
 // 修改密码
 export function changePassword(userBodyChanePassword) {
-  axios.post("/customer/changePassword", userBodyChanePassword).then(response => {
-    setTimeout(() => {
-      alert(response.data.message);
-    }, 200);
-  });
+  axios
+    .post("/customer/changePassword", userBodyChanePassword)
+    .then(response => {
+      setTimeout(() => {
+        alert(response.data.message);
+      }, 200);
+    });
 }

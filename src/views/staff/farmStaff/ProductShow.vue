@@ -1,628 +1,341 @@
-// 显示所有产品
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="col-lg-12">
-          <div class="col-lg-8 m-auto">
-            <br />
-            <br />
-            <br />
-            <form action="">
-              <div class="form-group text-left">
-                <div class="row">
-                  <div class="col-lg-12">
-                    <div class="row">
-                      <div class="col-lg-2">
-                        <label for="" class="font-weight-bold">选择类型</label>
-                      </div>
-                      <div class="col-lg-3">
-                        <select
-                          class="form-control"
-                          v-model="productType"
-                          @change="changeProductType"
-                        >
-                          <option
-                            v-for="(productType, index) in productTypeList"
-                            :key="index"
-                            :value="productType"
-                          >
-                            {{ productType }}
-                          </option>
-                        </select>
-                      </div>
-                      <div class="col-lg-7">
-                        <input
-                          type="button"
-                          class="btn btn-primary"
-                          style="float:right"
-                          value="添加农产品"
-                          data-toggle="modal"
-                          data-target="#product"
-                          @click="addProduct"
-                        />
-                      </div>
-                    </div>
-                  </div>
+  <div>
+    <!-- 导航栏 -->
+    <farmStaffNavbar />
+
+    <!-- 主体内容 -->
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
+      <div class="row justify-content-center">
+        <div class="col-xl-12">
+          <div class="card-farm p-4">
+            <!-- 页面标题 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h2 class="farm-title mb-2">
+                  <i class="bi bi-egg-fill me-2"></i>{{ productType }}管理
+                </h2>
+                <p class="text-muted mb-0">
+                  管理农场{{ productType }}的库存、生产和销售记录
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-farm-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#productModal"
+                @click="addProduct"
+              >
+                <i class="bi bi-plus-circle me-2"></i>添加农产品
+              </button>
+            </div>
+
+            <!-- 类型选择区域 -->
+            <div class="type-selection-section mb-4">
+              <div class="row align-items-center">
+                <div class="col-md-3">
+                  <label class="form-label-farm">
+                    <i class="bi bi-tags me-1"></i>选择类型：
+                  </label>
+                </div>
+                <div class="col-md-4">
+                  <select
+                    class="form-select form-control-farm"
+                    v-model="productType"
+                    @change="changeProductType"
+                  >
+                    <option
+                      v-for="(type, index) in productTypeList"
+                      :key="index"
+                      :value="type"
+                    >
+                      {{ type }}
+                    </option>
+                  </select>
                 </div>
               </div>
-              <hr />
-              <br />
-              <table class="table table-borderless">
+            </div>
+
+            <!-- 产品表格 -->
+            <div class="table-responsive">
+              <table class="table table-farm">
                 <thead>
                   <tr>
-                    <th style="text-align: center;" class="text-truncate">
-                      农产品名
+                    <th class="text-center">
+                      <i class="bi bi-tag me-1"></i>农产品名
                     </th>
-                    <th style="text-align: center;" class="text-truncate">
-                      库存
+                    <th class="text-center">
+                      <i class="bi bi-box me-1"></i>当前库存
                     </th>
-                    <th style="text-align: center;" class="text-truncate">
-                      安全库存
+                    <th class="text-center">
+                      <i class="bi bi-shield-check me-1"></i>安全库存
                     </th>
-                    <th style="text-align: center;" class="text-truncate"></th>
-                    <th style="text-align: center;" class="text-truncate"></th>
+                    <th class="text-center">
+                      <i class="bi bi-exclamation-triangle me-1"></i>库存状态
+                    </th>
+                    <th class="text-center">
+                      <i class="bi bi-gear me-1"></i>操作
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(product, index) in productList" :key="index">
-                    <td style="text-align: center;" class="text-truncate">
+                  <tr
+                    v-for="(product, index) in productList"
+                    :key="index"
+                    class="table-row-hover"
+                  >
+                    <td class="text-center fw-bold text-farm-primary">
                       {{ product.name }}
                     </td>
-                    <td style="text-align: center;" class="text-truncate">
-                      {{ product.amount }}{{ product.unit }}
+                    <td class="text-center">
+                      <span class="inventory-amount">
+                        {{ product.amount }}{{ product.unit }}
+                      </span>
                     </td>
-                    <td style="text-align: center;" class="text-truncate">
-                      {{ product.safeAmount }}{{ product.unit }}
+                    <td class="text-center">
+                      <span class="safe-amount">
+                        {{ product.safeAmount }}{{ product.unit }}
+                      </span>
                     </td>
-                    <td
-                      style="text-align: center;color:red"
-                      class="text-truncate"
-                    >
-                      {{ product.amount >= product.safeAmount ? null : "缺货" }}
+                    <td class="text-center">
+                      <span
+                        v-if="product.amount <= product.safeAmount"
+                        class="badge bg-danger"
+                      >
+                        <i class="bi bi-exclamation-triangle me-1"></i>库存不足
+                      </span>
+                      <span v-else class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>库存充足
+                      </span>
                     </td>
-                    <td>
-                      <!-- <input
-                        type="button"
-                        value="修改"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#product"
-                        @click="modifyProduct(product)"
-                      /> -->
-                      <input
-                        type="button"
-                        value="生产"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#produce"
-                        @click="produce(product)"
-                      />
-                      {{ &nbsp; }}
-                      <input
-                        type="button"
-                        value="异常消耗"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#consumption"
-                        @click="abnormalConsumption(product)"
-                      />{{ &nbsp; }}
-                      <input
-                        type="button"
-                        value="删除"
-                        class="btn btn-light"
-                        @click="deleteProduct(product)"
-                      />
+                    <td class="text-center">
+                      <div class="btn-group-vertical btn-group-sm" role="group">
+                        <button
+                          type="button"
+                          class="btn btn-farm-primary btn-sm mb-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#produceModal"
+                          @click="produce(product)"
+                        >
+                          <i class="bi bi-tools me-1"></i>生产
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-warning btn-sm mb-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#consumptionModal"
+                          @click="abnormalConsumption(product)"
+                        >
+                          <i class="bi bi-exclamation-circle me-1"></i>异常消耗
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-danger btn-sm"
+                          @click="deleteProduct(product)"
+                        >
+                          <i class="bi bi-trash me-1"></i>删除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="productList.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4">
+                      <i class="bi bi-egg me-2"></i>暂无{{ productType }}数据
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <nav aria-label="Page navigation">
-                <ul class="pagination">
-                  <li class="page-item">
-                    <a
+            </div>
+
+            <!-- 分页器 -->
+            <div
+              class="d-flex justify-content-center"
+              v-if="pageBody1.pageList && pageBody1.pageList.length > 1"
+            >
+              <nav :aria-label="productType + '分页'">
+                <ul class="pagination pagination-farm">
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === 1 }"
+                  >
+                    <button
+                      type="button"
                       class="page-link"
-                      href="#"
-                      aria-label="Previous"
                       @click="doPage(1)"
+                      :disabled="pageBody1.page === 1"
                     >
-                      <span aria-hidden="true">&laquo;</span>
-                      <span class="sr-only">Previous</span>
-                    </a>
+                      <i class="bi bi-chevron-double-left"></i>
+                    </button>
                   </li>
                   <li
                     v-for="(page, index) in pageBody1.pageList"
                     :key="index"
-                    :class="
-                      pageBody1.page == page ? 'page-item active' : 'page-item'
-                    "
+                    class="page-item"
+                    :class="{ active: pageBody1.page === page }"
                   >
-                    <a class="page-link" href="#" @click="doPage(page)">
-                      {{ page }}
-                    </a>
-                  </li>
-                  <li class="page-item">
-                    <a
+                    <button
+                      type="button"
                       class="page-link"
-                      href="#"
-                      aria-label="Next"
-                      @click="doPage(pageBody1.pages)"
+                      @click="doPage(page)"
                     >
-                      <span aria-hidden="true">&raquo;</span>
-                      <span class="sr-only">Next</span>
-                    </a>
+                      {{ page }}
+                    </button>
+                  </li>
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === pageBody1.pages }"
+                  >
+                    <button
+                      type="button"
+                      class="page-link"
+                      @click="doPage(pageBody1.pages)"
+                      :disabled="pageBody1.page === pageBody1.pages"
+                    >
+                      <i class="bi bi-chevron-double-right"></i>
+                    </button>
                   </li>
                 </ul>
               </nav>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- model -->
+    <!-- 添加产品模态框 -->
     <div
       class="modal fade"
-      id="product"
+      id="productModal"
       tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
+      aria-labelledby="productModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-farm">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">添加农产品</h5>
+            <h5 class="modal-title" id="productModalLabel">
+              <i class="bi bi-egg-fill me-2"></i>添加{{ productType }}
+            </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            农产品类型
-                          </span>
-                        </div>
-                        <select
-                          class="form-control"
-                          v-model="product.productType"
-                          :disabled="modelType == '修改' ? true : false"
-                        >
-                          <option
-                            v-for="(productType, index) in productTypeList"
-                            :key="index"
-                            :value="productType"
-                          >
-                            {{ productType }}
-                          </option>
-                        </select>
-                      </div>
-                      <p style="color: red;">
-                        {{ typeMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            农产品名
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.name"
-                          :disabled="modelType == '修改' ? true : false"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="nameWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ nameMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            库存
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.amount"
-                          :disabled="modelType == '修改' ? true : false"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite"
-                        />
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            安全库存
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.safeAmount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.unit"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="unitWrite"
-                        />
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            原料单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.baseUnit"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="unitWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ unitMessage }}
-                      </p>
-                    </div>
-                  </div>
+            <div class="product-form">
+              <div class="mb-3">
+                <label class="form-label-farm">{{ productType }}名称：</label>
+                <input
+                  type="text"
+                  class="form-control form-control-farm"
+                  v-model="product.name"
+                />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label-farm">单位：</label>
+                  <input
+                    type="text"
+                    class="form-control form-control-farm"
+                    v-model="product.unit"
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label-farm">安全库存：</label>
+                  <input
+                    type="number"
+                    class="form-control form-control-farm"
+                    v-model="product.safeAmount"
+                    min="0"
+                  />
                 </div>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                :value="modelType"
-                class="btn btn-primary"
-                @click="doModel"
-              />
-            </div>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bi bi-x-circle me-2"></i>取消
+            </button>
+            <button
+              type="button"
+              class="btn btn-farm-primary"
+              @click="saveProduct"
+            >
+              <i class="bi bi-check-circle me-2"></i>保存
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- model -->
+    <!-- 生产模态框 -->
     <div
       class="modal fade"
-      id="consumption"
+      id="produceModal"
       tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
+      aria-labelledby="produceModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-farm">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">农产品消耗</h5>
+            <h5 class="modal-title" id="produceModalLabel">
+              <i class="bi bi-tools me-2"></i>{{ productType }}生产
+            </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            农产品类型
-                          </span>
-                        </div>
-                        <select
-                          class="form-control"
-                          v-model="product.productType"
-                          @change="changeProductType"
-                          disabled
-                        >
-                          <option
-                            v-for="(productType, index) in productTypeList"
-                            :key="index"
-                            :value="productType"
-                          >
-                            {{ productType }}
-                          </option>
-                        </select>
-                      </div>
-                      <p style="color: red;">
-                        {{ typeMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            农产品名
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.name"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="nameWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ nameMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            异常消耗数量
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite1"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage1 }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.unit"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="unitWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ unitMessage }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+            <div class="produce-form">
+              <div class="mb-3">
+                <label class="form-label-farm">{{ productType }}名称：</label>
+                <input
+                  type="text"
+                  class="form-control form-control-farm"
+                  v-model="produceProduct.name"
+                  readonly
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label-farm">生产数量：</label>
+                <input
+                  type="number"
+                  class="form-control form-control-farm"
+                  v-model="produceAmount"
+                  min="1"
+                />
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="doModel1"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- model -->
-    <div
-      class="modal fade"
-      id="produce"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">农产品生产</h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
             >
-              <span aria-hidden="true">&times;</span>
+              <i class="bi bi-x-circle me-2"></i>取消
             </button>
-          </div>
-          <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            农产品类型
-                          </span>
-                        </div>
-                        <select
-                          class="form-control"
-                          v-model="product.productType"
-                          @change="changeProductType"
-                          disabled
-                        >
-                          <option
-                            v-for="(productType, index) in productTypeList"
-                            :key="index"
-                            :value="productType"
-                          >
-                            {{ productType }}
-                          </option>
-                        </select>
-                      </div>
-                      <p style="color: red;">
-                        {{ typeMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            农产品名
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.name"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="nameWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ nameMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            生产数量
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite2"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage2 }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="product.unit"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="unitWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ unitMessage }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="doModel2"
-              />
-            </div>
+            <button
+              type="button"
+              class="btn btn-farm-primary"
+              @click="saveProduce"
+            >
+              <i class="bi bi-check-circle me-2"></i>确认生产
+            </button>
           </div>
         </div>
       </div>
     </div>
 
-    <br />
-    <br />
-    <br />
+    <!-- 页脚 -->
+    <footerNavbar />
   </div>
 </template>
 
@@ -631,231 +344,104 @@ import bus from "@/util/Bus";
 import {
   initProduct,
   doPage,
-  addProduct,
-  deleteProduct,
-  modifyProduct,
-  abnormalConsumption,
-  produce
-} from "@/api/farmStaff.js";
-import $ from "jquery";
+  modifyProduct as saveProduct,
+  produce as saveProduce,
+  deleteProduct
+} from "@/api/farmStaff";
+import farmStaffNavbar from "@/components/Header/FarmStaffNavbar.vue";
+import footerNavbar from "@/components/FooterNavbar.vue";
 
 export default {
   name: "ProductShow",
-  data: () => ({
-    productType: "家禽",
-    productTypeList: ["家禽", "鱼类", "果蔬"],
-    productList: [],
-    pageBody1: {
-      page: null,
-      pages: null,
-      pageList: []
-    },
-    modelType: null,
-    product: {
-      id: null,
-      productType: null,
-      name: null,
-      amount: null,
-      safeAmount: null,
-      unit: null,
-      baseUnit: null
-    },
-    typeMessage: null,
-    nameMessage: null,
-    amountMessage: null,
-    amountMessage1: null,
-    amountMessage2: null,
-    unitMessage: null,
-    nowAmount: null
-  }),
+  components: {
+    farmStaffNavbar,
+    footerNavbar
+  },
+  data() {
+    return {
+      productType: "蔬菜",
+      productTypeList: ["蔬菜", "水果", "禽蛋", "肉类"],
+      productList: [],
+      pageBody1: {
+        page: 1,
+        pages: 1,
+        pageList: []
+      },
+      product: {
+        id: null,
+        name: null,
+        productType: null,
+        amount: 0,
+        unit: null,
+        safeAmount: 0
+      },
+      produceProduct: {
+        id: null,
+        name: null
+      },
+      produceAmount: 0
+    };
+  },
   methods: {
     changeProductType() {
-      this.typeMessage = null;
       initProduct(this.productType);
     },
     doPage(page) {
-      this.pageBody1.page = page;
-      doPage(this.pageBody1, this.productType);
+      doPage(page, this.productType);
     },
     addProduct() {
-      this.modelType = "添加";
-      this.product.id = null;
-      this.product.productType = null;
-      this.product.name = null;
-      this.product.amount = null;
-      this.product.safeAmount = null;
-      this.product.unit = null;
-      this.product.baseUnit = null;
-      this.typeMessage = null;
-      this.nameMessage = null;
-      this.amountMessage = null;
-      this.amountMessage1 = null;
-      this.amountMessage2 = null;
-      this.unitMessage = null;
+      this.product = {
+        id: null,
+        name: null,
+        productType: this.productType,
+        amount: 0,
+        unit: null,
+        safeAmount: 0
+      };
     },
-    modifyProduct(product) {
-      this.typeMessage = null;
-      this.nameMessage = null;
-      this.amountMessage = null;
-      this.amountMessage1 = null;
-      this.amountMessage2 = null;
-      this.unitMessage = null;
-      this.product = JSON.parse(JSON.stringify(product));
-      this.modelType = "修改";
-    },
-    doModel() {
-      if (
-        (this.product.productType == null) |
-        (this.product.name == null) |
-        (this.product.amount == null) |
-        (this.product.safeAmount == null) |
-        (this.product.unit == null) |
-        (this.product.baseUnit == null)
-      ) {
-        if (this.product.productType == null) {
-          this.typeMessage = "请选择农产品类型！";
-        }
-        if (this.product.name == null) {
-          this.nameMessage = "请输入农产品名！";
-        }
-        if (this.product.amount == null || this.product.safeAmount == null) {
-          this.amountMessage = "请输入库存或安全库存！";
-        }
-        if (this.product.unit == null || this.product.baseUnit == null) {
-          this.unitMessage = "请输入单位！";
-        }
+    saveProduct() {
+      if (this.product.name && this.product.unit) {
+        saveProduct(this.product, this.productType);
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("productModal")
+        );
+        if (modal) modal.hide();
       } else {
-        let cn = /^[\u4E00-\u9FA5]+$/;
-        let re = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (this.product.productType == "家禽") {
-          re = /^(0|\+?[1-9][0-9]*)$/;
-        }
-        if (
-          !re.test(this.product.amount) ||
-          !re.test(this.product.safeAmount)
-        ) {
-          if (this.product.productType == "家禽") {
-            this.amountMessage = "请输入正整数！";
-          } else {
-            this.amountMessage = "请输入正数（最高小数点后两位）！";
-          }
-        } else if (
-          !cn.test(this.product.unit) ||
-          !cn.test(this.product.baseUnit)
-        ) {
-          this.unitMessage = "请输入中文！";
-        } else if (!cn.test(this.product.name)) {
-          this.nameMessage = "请输入中文！";
-        } else {
-          if (this.modelType == "添加") {
-            addProduct(this.product);
-            $("#product").modal("hide");
-            this.productType = this.product.productType;
-          } else if (this.modelType == "修改") {
-            modifyProduct(this.product);
-            $("#product").modal("hide");
-            this.productType = this.product.productType;
-          }
-        }
-      }
-    },
-    nameWrite() {
-      this.nameMessage = null;
-    },
-    amountWrite() {
-      this.amountMessage = null;
-    },
-    amountWrite1() {
-      this.amountMessage1 = null;
-    },
-    amountWrite2() {
-      this.amountMessage2 = null;
-    },
-    unitWrite() {
-      this.unitMessage = null;
-    },
-    deleteProduct(product) {
-      let con = confirm(`是否删除：${product.name}`);
-      if (con == true) {
-        deleteProduct(product);
-      }
-    },
-    abnormalConsumption(product) {
-      this.nowAmount = product.amount;
-      this.typeMessage = null;
-      this.nameMessage = null;
-      this.amountMessage = null;
-      this.amountMessage1 = null;
-      this.amountMessage2 = null;
-      this.unitMessage = null;
-      this.product = JSON.parse(JSON.stringify(product));
-      this.product.amount = null;
-    },
-    doModel1() {
-      if (this.product.amount == null) {
-        this.amountMessage1 = "请输入消耗数量！";
-      } else {
-        let re = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (this.product.productType == "家禽") {
-          re = /^(0|\+?[1-9][0-9]*)$/;
-        }
-        if (
-          !re.test(this.product.amount) ||
-          !re.test(this.product.safeAmount)
-        ) {
-          if (this.product.productType == "家禽") {
-            this.amountMessage1 = "请输入正整数！";
-          } else {
-            this.amountMessage1 = "请输入正数（最高小数点后两位）！";
-          }
-        } else if (this.product.amount > this.nowAmount) {
-          this.amountMessage1 = "库存不足！";
-        } else {
-          abnormalConsumption(this.product);
-          $("#consumption").modal("hide");
-          this.productType = this.product.productType;
-        }
+        alert("请填写完整的产品信息");
       }
     },
     produce(product) {
-      this.typeMessage = null;
-      this.nameMessage = null;
-      this.amountMessage = null;
-      this.amountMessage1 = null;
-      this.amountMessage2 = null;
-      this.unitMessage = null;
-      this.product = JSON.parse(JSON.stringify(product));
-      this.product.amount = null;
+      this.produceProduct = JSON.parse(JSON.stringify(product));
+      this.produceAmount = 0;
     },
-    doModel2() {
-      if (this.product.amount == null) {
-        this.amountMessage2 = "请输入生产数量！";
+    saveProduce() {
+      if (this.produceAmount > 0) {
+        saveProduce(this.produceProduct.id, this.produceAmount);
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("produceModal")
+        );
+        if (modal) modal.hide();
       } else {
-        let re = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (this.product.productType == "家禽") {
-          re = /^(0|\+?[1-9][0-9]*)$/;
-        }
-        if (!re.test(this.product.amount)) {
-          if (this.product.productType == "家禽") {
-            this.amountMessage2 = "请输入正整数！";
-          } else {
-            this.amountMessage2 = "请输入正数（最高小数点后两位）！";
-          }
-        } else {
-          produce(this.product);
-          $("#produce").modal("hide");
-          this.productType = this.product.productType;
-        }
+        alert("请输入有效的生产数量");
       }
+    },
+    deleteProduct(product) {
+      if (confirm(`确定要删除 ${product.name} 吗？`)) {
+        deleteProduct(product.id, this.productType);
+      }
+    },
+    abnormalConsumption(product) {
+      this.produceProduct = JSON.parse(JSON.stringify(product));
     }
   },
   created() {
     initProduct(this.productType);
+
     bus.$on(bus.productList, data => {
-      this.productList = data;
+      this.productList = data || [];
     });
     bus.$on(bus.pageBody1, data => {
-      this.pageBody1 = data;
+      this.pageBody1 = data || { page: 1, pages: 1, pageList: [] };
     });
   },
   beforeDestroy() {
@@ -864,3 +450,82 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.type-selection-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid var(--farm-border-light);
+}
+
+.form-label-farm {
+  font-weight: 600;
+  color: var(--farm-green-dark);
+  margin-bottom: 0.5rem;
+}
+
+.form-control-farm {
+  border: 2px solid var(--farm-border-light);
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control-farm:focus {
+  border-color: var(--farm-green);
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.table-farm thead {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.table-row-hover:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.05),
+    rgba(129, 199, 132, 0.05)
+  );
+}
+
+.inventory-amount,
+.safe-amount {
+  font-weight: 600;
+  color: var(--farm-green-dark);
+}
+
+.btn-group-vertical .btn {
+  min-width: 100px;
+}
+
+.modal-farm .modal-header {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.pagination-farm {
+  --bs-pagination-color: var(--farm-green-dark);
+  --bs-pagination-border-color: var(--farm-border-light);
+  --bs-pagination-hover-color: white;
+  --bs-pagination-hover-bg: var(--farm-green);
+  --bs-pagination-active-bg: var(--farm-green-dark);
+}
+
+@media (max-width: 768px) {
+  .btn-group-vertical .btn {
+    min-width: 80px;
+    font-size: 0.8rem;
+  }
+}
+</style>

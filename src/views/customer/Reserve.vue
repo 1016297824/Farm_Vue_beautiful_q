@@ -1,89 +1,100 @@
 // 顾客预定 - 绿色主题
 <template>
-  <div class="container py-8">
+  <div>
+    <!-- 导航栏 -->
+    <customerNavbar />
+
     <!-- 主体 -->
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="col-lg-8 m-auto">
-          <div class="farm-card p-6 transform transition-all duration-500 hover:shadow-xl">
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="card-farm p-4">
             <!-- 标题栏 -->
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="farm-title text-xl md:text-2xl font-bold">
-                <i class="fas fa-calendar-alt mr-2 text-green-600"></i>我的订单
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="farm-title mb-0">
+                <i class="bi bi-calendar-check me-2"></i>我的预订记录
               </h2>
               <button
                 type="button"
-                class="farm-btn farm-btn-primary flex items-center shadow-lg hover:shadow-xl transform transition-all duration-300"
+                class="btn btn-farm-primary"
                 @click="addReserve"
               >
-                <i class="fas fa-plus mr-2"></i>添加订单
+                <i class="bi bi-plus-circle me-2"></i>新增预订
               </button>
             </div>
-            
+
             <!-- 表格 -->
-            <div class="overflow-x-auto">
-              <table class="farm-table w-full">
+            <div class="table-responsive">
+              <table class="table table-farm">
                 <thead>
-                  <tr class="bg-green-50">
-                    <th class="py-3 px-4 text-left text-green-700 font-medium rounded-tl-lg">
-                      订单号
-                    </th>
-                    <th class="py-3 px-4 text-left text-green-700 font-medium">
-                      桌位
-                    </th>
-                    <th class="py-3 px-4 text-left text-green-700 font-medium">
-                      开始时间
-                    </th>
-                    <th class="py-3 px-4 text-left text-green-700 font-medium">
-                      结束时间
-                    </th>
-                    <th class="py-3 px-4 text-left text-green-700 font-medium rounded-tr-lg">
-                      下单时间
-                    </th>
+                  <tr>
+                    <th>订单号</th>
+                    <th>桌位</th>
+                    <th>开始时间</th>
+                    <th>结束时间</th>
+                    <th>下单时间</th>
+                    <th class="text-center">操作</th>
                   </tr>
                 </thead>
                 <tbody v-if="reserveList && reserveList.length > 0">
-                  <tr v-for="(reserve, index) in reserveList" :key="index" class="border-b border-gray-100 hover:bg-green-50/50 transition-colors duration-200">
-                    <td class="py-3 px-4 text-gray-700 font-medium">
-                      {{ reserve.no }}
-                    </td>
-                    <td class="py-3 px-4 text-gray-600">
-                      {{ reserve.diningTable.id }}
-                    </td>
-                    <td class="py-3 px-4 text-gray-600">
-                      {{ reserve.startTime | formatDate }}
-                    </td>
-                    <td class="py-3 px-4 text-gray-600">
-                      {{ reserve.endTime | formatDate }}
-                    </td>
-                    <td class="py-3 px-4 text-gray-500 text-sm">
+                  <tr v-for="(reserve, index) in reserveList" :key="index">
+                    <td class="fw-medium">{{ reserve.no }}</td>
+                    <td>{{ reserve.diningTable.id }}</td>
+                    <td>{{ reserve.startTime | formatDate }}</td>
+                    <td>{{ reserve.endTime | formatDate }}</td>
+                    <td class="text-muted">
                       {{ reserve.insertTime | formatDate }}
                     </td>
-                  </tr>
-                </tbody>
-                <tbody v-else-if="reserveList !== null">
-                  <tr>
-                    <td colspan="5" class="py-12 text-center">
-                      <div class="flex flex-col items-center text-gray-500">
-                        <i class="fas fa-calendar-check text-4xl mb-4 text-green-400"></i>
-                        <p class="text-lg">暂无订单记录</p>
-                        <p class="mt-2 text-sm">点击"添加订单"按钮开始您的预订</p>
-                      </div>
+                    <td class="text-center">
+                      <button
+                        type="button"
+                        class="btn btn-farm-secondary btn-sm me-2"
+                        @click="viewDetails(reserve)"
+                        title="查看详情"
+                      >
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        @click="deleteReserve(reserve.no)"
+                        title="取消预订"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </button>
                     </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            
+
+            <!-- 空数据状态 -->
+            <div
+              v-if="reserveList && reserveList.length === 0"
+              class="text-center py-5"
+            >
+              <i class="bi bi-calendar-x display-1 text-muted mb-3"></i>
+              <h5 class="text-muted mb-3">暂无预订记录</h5>
+              <p class="text-muted">点击“新增预订”按钮开始您的预订</p>
+              <button class="btn btn-farm-primary mt-3" @click="addReserve">
+                <i class="bi bi-plus-circle me-2"></i>立即预订
+              </button>
+            </div>
+
             <!-- 加载状态 -->
-            <div v-if="reserveList === null" class="py-12 text-center">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
-              <p class="mt-4 text-gray-500">加载订单中...</p>
+            <div v-if="reserveList === null" class="text-center py-5">
+              <div class="spinner-border text-success mb-3" role="status">
+                <span class="visually-hidden">加载中...</span>
+              </div>
+              <p class="text-muted">正在加载预订信息...</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 页脚 -->
+    <footerNavbar />
   </div>
 </template>
 
@@ -94,94 +105,204 @@ import { getReserve, deleteReserve } from "@/api/customer";
 
 export default {
   name: "Reserve",
-  data: () => ({
-    reserveList: null
-  }),
+  data() {
+    return {
+      reserveList: null
+    };
+  },
   methods: {
-    addReserve: function() {
-      // 添加页面切换动画
-      document.querySelector('.container').style.opacity = '0';
-      document.querySelector('.container').style.transform = 'translateX(20px)';
-      document.querySelector('.container').style.transition = 'all 0.3s ease';
-      
-      setTimeout(() => {
-        this.$router.push("reserveAdd");
-      }, 300);
+    async addReserve() {
+      try {
+        // 添加页面切换动画
+        await this.animatePageExit();
+        this.$router.push("/customer/reserveAdd");
+      } catch (error) {
+        console.error("页面跳转失败:", error);
+        this.$router.push("/customer/reserveAdd");
+      }
     },
-    deleteReserve(no) {
-      let con = confirm(`取消订单：\n订单号：${no}`);
-      if (con == true) {
-        deleteReserve(no);
+
+    async deleteReserve(no) {
+      try {
+        const confirmed = confirm(`确定要取消以下预订吗？\n订单号：${no}`);
+        if (confirmed) {
+          await deleteReserve(no);
+          this.$farmMessage.success("预订已成功取消");
+          // 重新加载数据
+          this.loadReserveData();
+        }
+      } catch (error) {
+        console.error("取消预订失败:", error);
+        this.$farmMessage.error("取消预订失败，请稍后重试");
+      }
+    },
+
+    viewDetails(reserve) {
+      // 查看预订详情
+      this.$farmMessage.info(
+        `订单号：${reserve.no}\n桌位：${reserve.diningTable.id}`
+      );
+    },
+
+    loadReserveData() {
+      this.reserveList = null;
+      getReserve();
+    },
+
+    animatePageEntry() {
+      const container = document.querySelector(".container");
+      if (container) {
+        container.style.opacity = "0";
+        container.style.transform = "translateY(20px)";
+        container.style.transition = "all 0.6s ease";
+
+        setTimeout(() => {
+          container.style.opacity = "1";
+          container.style.transform = "translateY(0)";
+        }, 100);
+      }
+    },
+
+    async animatePageExit() {
+      const container = document.querySelector(".container");
+      if (container) {
+        container.style.opacity = "0";
+        container.style.transform = "translateX(20px)";
+        container.style.transition = "all 0.3s ease";
+
+        return new Promise(resolve => {
+          setTimeout(resolve, 300);
+        });
       }
     }
   },
+
   filters: {
     formatDate(time) {
-      var date = new Date(time);
-      return formatDate(date, "yyyy-MM-dd hh : mm");
+      if (!time) return "--";
+      const date = new Date(time);
+      return formatDate(date, "yyyy-MM-dd hh:mm");
     }
   },
+
   created() {
     bus.$on(bus.reserveList, data => {
       // 添加数据加载动画
-      this.reserveList = null;
       setTimeout(() => {
-        this.reserveList = data;
-      }, 500);
+        this.reserveList = data || [];
+      }, 300);
     });
   },
+
   mounted() {
     // 页面加载动画效果
-    document.querySelector('.container').style.opacity = '0';
-    document.querySelector('.container').style.transform = 'translateY(20px)';
-    document.querySelector('.container').style.transition = 'all 0.6s ease';
-    
+    this.animatePageEntry();
+
+    // 加载订单数据
     setTimeout(() => {
-      document.querySelector('.container').style.opacity = '1';
-      document.querySelector('.container').style.transform = 'translateY(0)';
-      
-      // 加载订单数据
-      getReserve();
-    }, 300);
+      this.loadReserveData();
+    }, 500);
   },
+
   beforeDestroy() {
     bus.$off(bus.reserveList);
+  },
+
+  components: {
+    customerNavbar: () => import("@/components/Header/CustomerNavbar"),
+    footerNavbar: () => import("@/components/FooterNavbar")
   }
 };
 </script>
 
 <style scoped>
-/* 表格样式 */
-.farm-table {
-  border-collapse: collapse;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+/* 页面动画效果 */
+.card-farm {
+  animation: fadeInUp 0.6s ease;
+}
+
+/* 表格增强样式 */
+.table-farm tbody tr:hover {
+  background-color: var(--farm-green-50) !important;
+  transform: translateX(2px);
+  transition: all 0.2s ease;
+}
+
+/* 按钮动画 */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
   .container {
-    padding-top: 2rem !important;
-    padding-bottom: 2rem !important;
+    padding-top: 80px !important;
+    padding-bottom: 60px !important;
   }
-  
-  .col-lg-8 {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+
+  .card-farm {
+    margin: 0 1rem;
   }
-  
-  .farm-card {
-    padding: 1.5rem !important;
+
+  .table-responsive {
+    border-radius: 0.5rem;
+    overflow: hidden;
   }
-  
+
+  .btn {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding-top: 70px !important;
+  }
+
   .farm-title {
-    font-size: 1.5rem !important;
+    font-size: 1.25rem !important;
   }
-  
-  .overflow-x-auto {
-    -webkit-overflow-scrolling: touch;
+
+  .table-farm th,
+  .table-farm td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* 加载动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 空状态动画 */
+.display-1 {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
@@ -191,12 +312,13 @@ export default {
     align-items: stretch;
     gap: 1rem;
   }
-  
+
   .farm-btn {
     width: 100%;
   }
-  
-  th, td {
+
+  th,
+  td {
     padding: 0.75rem 1rem !important;
   }
 }

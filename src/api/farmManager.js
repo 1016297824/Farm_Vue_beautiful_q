@@ -46,11 +46,13 @@ export function takeOffice(staff, id) {
 
 // 修改密码
 export function changePassword(userBodyChangePassword) {
-  axios.post("farmManager/changePassword", userBodyChangePassword).then(response => {
-    setTimeout(() => {
-      alert(response.data.message);
-    }, 200);
-  });
+  axios
+    .post("farmManager/changePassword", userBodyChangePassword)
+    .then(response => {
+      setTimeout(() => {
+        alert(response.data.message);
+      }, 200);
+    });
 }
 
 // 初始化考勤信息

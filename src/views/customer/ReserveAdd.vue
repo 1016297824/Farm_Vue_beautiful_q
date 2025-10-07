@@ -1,290 +1,325 @@
-// 添加订单
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="col-lg-8 m-auto">
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <form action="">
-            <div class="form-group text-left">
+  <div>
+    <!-- 导航栏 -->
+    <customerNavbar />
+
+    <!-- 主体内容 -->
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
+      <div class="row justify-content-center">
+        <div class="col-xl-10">
+          <div class="card-farm p-4">
+            <!-- 页面标题 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h2 class="farm-title mb-2">
+                  <i class="bi bi-calendar-plus me-2"></i>新增预订
+                </h2>
+                <p class="text-muted mb-0">选择您的用餐时间和心仪桌位</p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                @click="back"
+              >
+                <i class="bi bi-arrow-left me-2"></i>返回
+              </button>
+            </div>
+
+            <!-- 时间选择区域 -->
+            <div class="time-selection-section mb-4">
+              <h4 class="section-title mb-3">
+                <i class="bi bi-clock me-2"></i>选择时间
+                <small class="text-muted">(营业时间：9:00-21:00)</small>
+              </h4>
+
               <div class="row">
-                <div class="col-lg-8">
-                  <label for="" class="font-weight-bold">选择时间</label>
-                  <span>(9:00~21:00)</span>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label-farm">
+                    <i class="bi bi-calendar-date me-1"></i>开始时间：
+                  </label>
                   <input
-                    type="button"
-                    class="btn btn-light offset-lg-3"
-                    style="float:right"
-                    value="返回"
-                    @click="back"
+                    type="datetime-local"
+                    class="form-control form-control-farm"
+                    v-model="formattedStartTime"
+                    @change="startTimeChange"
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label-farm">
+                    <i class="bi bi-calendar-check me-1"></i>结束时间：
+                  </label>
+                  <input
+                    type="datetime-local"
+                    class="form-control form-control-farm"
+                    v-model="formattedEndTime"
+                    @change="endTimeChange"
                   />
                 </div>
               </div>
-              <br />
-              <div class="row">
-                <div class="col-lg-8">
-                  <span>开始时间：</span>
-                  <el-date-picker
-                    v-model="pageBody.startTime"
-                    type="datetime"
-                    format="yyyy-MM-dd HH:mm"
-                    placeholder="选择日期时间"
-                    :picker-options="pickerOptionsStartTime"
-                    @change="startTimeChange"
-                  >
-                  </el-date-picker>
-                  <!-- {{ pageBody.startTime }} -->
-                </div>
-              </div>
-              <br />
-              <span>结束时间：</span>
-              <el-date-picker
-                v-model="pageBody.endTime"
-                type="datetime"
-                format="yyyy-MM-dd HH:00"
-                placeholder="选择日期时间"
-                :picker-options="pickerOptionsEndTime"
-                @change="endTimeChange"
-              >
-              </el-date-picker>
-              <!-- {{ pageBody.endTime }} -->
-              <!-- {{ pageBody.endTime | formatDate }} -->
             </div>
-            <table class="table table-borderless">
-              <thead>
-                <tr>
-                  <th class="text-truncate">
-                    餐桌号
-                  </th>
-                  <th class="text-truncate">
-                    类型
-                  </th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(dt, index) in diningTableList" :key="index">
-                  <td class="text-truncate">{{ dt.id }}</td>
-                  <td class="text-truncate">{{ dt.type }}</td>
-                  <td>
-                    <input
-                      type="button"
-                      value="预定"
-                      class="btn btn-primary"
-                      @click="reserveAdd(dt)"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <nav aria-label="Page navigation">
-              <ul class="pagination">
-                <li class="page-item">
-                  <a
-                    class="page-link"
-                    href="#"
-                    aria-label="Previous"
-                    @click="doPage(1)"
-                  >
-                    <span aria-hidden="true">&laquo;</span>
-                    <span class="sr-only">Previous</span>
-                  </a>
-                </li>
-                <li
-                  v-for="(page, index) in pageBody.pageList"
-                  :key="index"
-                  :class="
-                    pageBody.page == page ? 'page-item active' : 'page-item'
-                  "
-                >
-                  <a class="page-link" href="#" @click="doPage(page)">{{
-                    page
-                  }}</a>
-                </li>
-                <li class="page-item">
-                  <a
-                    class="page-link"
-                    href="#"
-                    aria-label="Next"
-                    @click="doPage(pageBody.pages)"
-                  >
-                    <span aria-hidden="true">&raquo;</span>
-                    <span class="sr-only">Next</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </form>
+
+            <!-- 餐桌选择区域 -->
+            <div class="table-selection-section">
+              <h4 class="section-title mb-3">
+                <i class="bi bi-table me-2"></i>可用餐桌
+              </h4>
+
+              <div class="table-responsive">
+                <table class="table table-farm">
+                  <thead>
+                    <tr>
+                      <th class="text-center">
+                        <i class="bi bi-hash me-1"></i>餐桌号
+                      </th>
+                      <th class="text-center">
+                        <i class="bi bi-tags me-1"></i>桌位类型
+                      </th>
+                      <th class="text-center">
+                        <i class="bi bi-gear me-1"></i>操作
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(dt, index) in diningTableList"
+                      :key="index"
+                      class="table-row-hover"
+                    >
+                      <td class="text-center fw-bold text-farm-primary">
+                        {{ dt.id }}号桌
+                      </td>
+                      <td class="text-center">
+                        <span class="badge bg-farm-secondary">{{
+                          dt.type
+                        }}</span>
+                      </td>
+                      <td class="text-center">
+                        <button
+                          type="button"
+                          class="btn btn-farm-success btn-sm"
+                          @click="reserveAdd(dt)"
+                        >
+                          <i class="bi bi-calendar-check me-2"></i>预订
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <br />
-    <br />
-    <br />
+
+    <!-- 页脚 -->
+    <footerNavbar />
   </div>
 </template>
 
 <script>
 import bus from "@/util/Bus";
-import moment from "moment";
-import { formatDate } from "@/assets/js/date";
 import { initDiningTable, doPage, reserveAdd } from "@/api/customer";
+import customerNavbar from "@/components/Header/CustomerNavbar.vue";
+import footerNavbar from "@/components/FooterNavbar.vue";
 
 export default {
   name: "ReserveAdd",
-  data: () => ({
-    diningTableList: null,
-    pageBody: {
-      page: null,
-      pages: null,
-      pageList: null,
-      startTime: null,
-      endTime: null
-    },
-    pickerOptionsStartTime: {
-      disabledDate: time => {
-        return (
-          time.getTime() < Date.now() - 8.64e7 ||
-          time.getTime() > Date.now() + 6 * 8.64e7
-        );
+  components: {
+    customerNavbar,
+    footerNavbar
+  },
+  data() {
+    return {
+      diningTableList: [],
+      pageBody: {
+        page: 1,
+        pages: 1,
+        pageList: [1],
+        startTime: null,
+        endTime: null
+      }
+    };
+  },
+  computed: {
+    formattedStartTime: {
+      get() {
+        if (!this.pageBody.startTime) return "";
+        const date = new Date(this.pageBody.startTime);
+        return date.toISOString().slice(0, 16);
+      },
+      set(value) {
+        this.pageBody.startTime = new Date(value);
       }
     },
-    pickerOptionsEndTime: {
-      disabledDate: time => {
-        return (
-          time.getTime() < Date.now() - 8.64e7 ||
-          time.getTime() > Date.now() + 6 * 8.64e7
-        );
+    formattedEndTime: {
+      get() {
+        if (!this.pageBody.endTime) return "";
+        const date = new Date(this.pageBody.endTime);
+        return date.toISOString().slice(0, 16);
+      },
+      set(value) {
+        this.pageBody.endTime = new Date(value);
       }
     }
-  }),
+  },
   methods: {
     doPage(page) {
+      // 将日期时间转换为后端可以解析的格式
+      const pageBodyToSend = {
+        ...this.pageBody,
+        startTime: this.pageBody.startTime
+          ? this.pageBody.startTime
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " ")
+          : null,
+        endTime: this.pageBody.endTime
+          ? this.pageBody.endTime
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " ")
+          : null
+      };
+
       this.pageBody.page = page;
-      doPage(this.pageBody);
+      doPage(pageBodyToSend);
     },
     reserveAdd(dt) {
-      let con = confirm(
-        `确认预定：${dt.id}号桌\n时间：${this.pageBody.startTime}至${this.pageBody.endTime}\n注意：预定后取消需联系工作人员`
+      // 将日期时间转换为后端可以解析的格式
+      const pageBodyToSend = {
+        ...this.pageBody,
+        startTime: this.pageBody.startTime
+          ? this.pageBody.startTime
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " ")
+          : null,
+        endTime: this.pageBody.endTime
+          ? this.pageBody.endTime
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " ")
+          : null
+      };
+
+      const confirmed = confirm(
+        `确认预订：${dt.id}号桌\n时间：${this.pageBody.startTime}至${this.pageBody.endTime}\n注意：预订后取消需联系工作人员`
       );
-      if (con == true) {
+      if (confirmed) {
         this.pageBody.page = 1;
-        reserveAdd(dt, this.pageBody);
+        reserveAdd(dt, pageBodyToSend);
       }
     },
     back() {
-      this.$router.push("reserve");
+      this.$router.push("/customer/reserve");
     },
     startTimeChange() {
-      this.pageBody.startTime = new Date(this.pageBody.startTime);
-      this.pageBody.endTime = new Date(this.pageBody.endTime);
-      if (
-        this.pageBody.startTime.getTime() >= this.pageBody.endTime.getTime()
-      ) {
-        let newEndTime = new Date(this.pageBody.startTime);
-        this.pageBody.endTime = new Date(
-          newEndTime.getTime() + 1 * 60 * 60 * 1000
-        );
+      if (this.pageBody.startTime && this.pageBody.endTime) {
+        if (
+          this.pageBody.startTime.getTime() >= this.pageBody.endTime.getTime()
+        ) {
+          this.pageBody.endTime = new Date(
+            this.pageBody.startTime.getTime() + 60 * 60 * 1000
+          );
+        }
       }
-      let newDate1 = new Date(this.pageBody.startTime);
-      let newDate2 = new Date(this.pageBody.endTime);
-      newDate1.setHours(9);
-      newDate1.setMinutes(0);
-      newDate1.setSeconds(0);
-      newDate1.setMilliseconds(0);
-      newDate2.setHours(21);
-      newDate2.setMinutes(0);
-      newDate2.setSeconds(0);
-      newDate2.setMilliseconds(0);
-      if (newDate1.getTime() > this.pageBody.startTime.getTime()) {
-        this.pageBody.startTime.setHours(9);
-        this.pageBody.endTime.setHours(10);
-      }
-      if (newDate2.getTime() <= this.pageBody.startTime.getTime()) {
-        this.pageBody.startTime.setHours(20);
-        this.pageBody.endTime.setHours(21);
-      }
-      this.pageBody.startTime.setMinutes(0);
-      this.pageBody.startTime.setSeconds(0);
-      this.pageBody.startTime.setMilliseconds(0);
-      this.pageBody.endTime.setMinutes(0);
-      this.pageBody.endTime.setSeconds(0);
-      this.pageBody.endTime.setMilliseconds(0);
-      this.pageBody.startTime = moment(this.pageBody.startTime)
-        .utcOffset(480)
-        .format("YYYY-MM-DD HH:mm:ss");
-      this.pageBody.endTime = moment(this.pageBody.endTime)
-        .utcOffset(480)
-        .format("YYYY-MM-DD HH:mm:ss");
-      this.doPage(1);
+      this.loadDiningTables();
     },
     endTimeChange() {
-      this.pageBody.startTime = new Date(this.pageBody.startTime);
-      this.pageBody.endTime = new Date(this.pageBody.endTime);
-      if (
-        this.pageBody.startTime.getTime() >= this.pageBody.endTime.getTime()
-      ) {
-        let newStartTime = new Date(this.pageBody.endTime);
-        this.pageBody.startTime = new Date(
-          newStartTime.getTime() - 1 * 60 * 60 * 1000
-        );
+      this.loadDiningTables();
+    },
+    loadDiningTables() {
+      if (this.pageBody.startTime && this.pageBody.endTime) {
+        // 将日期时间转换为后端可以解析的格式
+        const pageBodyToSend = {
+          ...this.pageBody,
+          startTime: this.pageBody.startTime
+            ? this.pageBody.startTime
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ")
+            : null,
+          endTime: this.pageBody.endTime
+            ? this.pageBody.endTime
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " ")
+            : null
+        };
+
+        initDiningTable(pageBodyToSend);
       }
-      let newDate1 = new Date(this.pageBody.startTime);
-      let newDate2 = new Date(this.pageBody.endTime);
-      newDate1.setHours(9);
-      newDate1.setMinutes(0);
-      newDate1.setSeconds(0);
-      newDate1.setMilliseconds(0);
-      newDate2.setHours(21);
-      newDate2.setMinutes(0);
-      newDate2.setSeconds(0);
-      newDate2.setMilliseconds(0);
-      if (newDate1.getTime() >= this.pageBody.endTime.getTime()) {
-        this.pageBody.startTime.setHours(9);
-        this.pageBody.endTime.setHours(10);
-      }
-      if (newDate2.getTime() < this.pageBody.endTime.getTime()) {
-        this.pageBody.startTime.setHours(20);
-        this.pageBody.endTime.setHours(21);
-      }
-      this.pageBody.startTime.setMinutes(0);
-      this.pageBody.startTime.setSeconds(0);
-      this.pageBody.startTime.setMilliseconds(0);
-      this.pageBody.endTime.setMinutes(0);
-      this.pageBody.endTime.setSeconds(0);
-      this.pageBody.endTime.setMilliseconds(0);
-      this.pageBody.startTime = moment(this.pageBody.startTime)
-        .utcOffset(480)
-        .format("YYYY-MM-DD HH:mm:ss");
-      this.pageBody.endTime = moment(this.pageBody.endTime)
-        .utcOffset(480)
-        .format("YYYY-MM-DD HH:mm:ss");
-      this.doPage(1);
-    }
-  },
-  filters: {
-    formatDate(time) {
-      var date = new Date(time);
-      return formatDate(date, "yyyy-MM-dd hh : 00 : 00");
     }
   },
   created() {
-    initDiningTable();
     bus.$on(bus.diningTableList, data => {
-      this.diningTableList = data;
+      this.diningTableList = data || [];
     });
-    bus.$on(bus.pageBody, data => {
-      this.pageBody = data;
+    bus.$on(bus.pageBody2, data => {
+      this.pageBody = { ...this.pageBody, ...data };
     });
   },
-  mounted() {},
   beforeDestroy() {
     bus.$off(bus.diningTableList);
-    bus.$off(bus.pageBody);
+    bus.$off(bus.pageBody2);
   }
 };
 </script>
+
+<style scoped>
+.time-selection-section,
+.table-selection-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--farm-border-light);
+}
+
+.section-title {
+  color: var(--farm-green-dark);
+  font-weight: 600;
+  font-size: 1.3rem;
+}
+
+.form-label-farm {
+  font-weight: 600;
+  color: var(--farm-green-dark);
+  margin-bottom: 0.5rem;
+}
+
+.form-control-farm {
+  border: 2px solid var(--farm-border-light);
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control-farm:focus {
+  border-color: var(--farm-green);
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.table-farm thead {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.table-row-hover:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.05),
+    rgba(129, 199, 132, 0.05)
+  );
+}
+
+.bg-farm-secondary {
+  background: linear-gradient(135deg, #6c757d, #495057) !important;
+  color: white;
+}
+</style>

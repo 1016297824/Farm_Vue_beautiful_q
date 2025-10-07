@@ -1,69 +1,82 @@
-// 考勤管理（超级管理员）
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="col-lg-12">
-          <div class="col-lg-8 m-auto">
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <form action="">
-              <div class="form-group text-left">
-                <div class="row">
-                  <div class="col-lg-12">
-                    <label for="" class="font-weight-bold">考勤信息</label>
-                    <el-date-picker
-                      v-model="choosedDate"
-                      style="float:right"
-                      type="date"
-                      placeholder="选择日期"
-                      format="yyyy 年 MM 月 dd 日"
-                      @change="chooseDate"
-                    >
-                    </el-date-picker>
-                  </div>
+  <div>
+    <!-- 导航栏 -->
+    <superManagerNavbar />
+
+    <!-- 主体内容 -->
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
+      <div class="row justify-content-center">
+        <div class="col-xl-10">
+          <div class="card-farm p-4">
+            <!-- 页面标题 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h2 class="farm-title mb-2">
+                  <i class="bi bi-clock-history me-2"></i>考勤管理
+                </h2>
+                <p class="text-muted mb-0">管理员工考勤信息</p>
+              </div>
+            </div>
+
+            <!-- 日期选择区域 -->
+            <div class="date-selection-section mb-4">
+              <div class="row align-items-center">
+                <div class="col-md-3">
+                  <label class="form-label-farm">
+                    <i class="bi bi-calendar-date me-1"></i>选择日期：
+                  </label>
+                </div>
+                <div class="col-md-4">
+                  <input
+                    type="date"
+                    class="form-control form-control-farm"
+                    v-model="formattedDate"
+                    @change="chooseDate"
+                  />
+                </div>
+                <div class="col-md-5 text-end">
+                  <button
+                    type="button"
+                    class="btn btn-farm-primary"
+                    @click="updateAttendance"
+                  >
+                    <i class="bi bi-check-circle me-2"></i>提交考勤
+                  </button>
                 </div>
               </div>
-              <hr />
-              <table class="table table-borderless">
+            </div>
+
+            <!-- 考勤表格 -->
+            <div class="table-responsive">
+              <table class="table table-farm">
                 <thead>
                   <tr>
-                    <th style="text-align: center;" class="text-truncate">
-                      工号
+                    <th class="text-center">
+                      <i class="bi bi-person-badge me-1"></i>工号
                     </th>
-                    <th style="text-align: center;" class="text-truncate">
-                      姓名
+                    <th class="text-center">
+                      <i class="bi bi-person me-1"></i>姓名
                     </th>
-                    <th style="text-align: center;" class="text-truncate">
-                      工时
+                    <th class="text-center">
+                      <i class="bi bi-clock me-1"></i>工时
                     </th>
-                    <td>
-                      <input
-                        type="button"
-                        value="提交"
-                        class="btn btn-primary offset-lg-6"
-                        style="float:right"
-                        @click="updateAttendance"
-                      />
-                    </td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
                     v-for="(attendance, index) in attendanceList1"
                     :key="index"
+                    class="table-row-hover"
                   >
-                    <td style="text-align: center;" class="text-truncate">
+                    <td class="text-center fw-bold text-farm-primary">
                       {{ attendance.staff.username }}
                     </td>
-                    <td style="text-align: center;" class="text-truncate">
+                    <td class="text-center">
                       {{ attendance.staff.name }}
                     </td>
-                    <td style="text-align: center;" class="text-truncate">
+                    <td class="text-center">
                       <select
+                        class="form-select form-control-farm"
                         v-model="attendance.workingHours"
                         @change="changeWorkingHours(attendance)"
                       >
@@ -72,85 +85,125 @@
                           :key="index"
                           :value="workingHours"
                         >
-                          {{ workingHours }}
+                          {{ workingHours }} 小时
                         </option>
                       </select>
-                      {{ "小时" }}
+                    </td>
+                  </tr>
+                  <tr v-if="attendanceList1.length === 0">
+                    <td colspan="3" class="text-center text-muted py-4">
+                      <i class="bi bi-clock-history me-2"></i>暂无考勤数据
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <nav aria-label="Page navigation">
-                <ul class="pagination">
-                  <li class="page-item">
-                    <a
+            </div>
+
+            <!-- 分页器 -->
+            <div
+              class="d-flex justify-content-center"
+              v-if="pageBody1.pageList && pageBody1.pageList.length > 1"
+            >
+              <nav aria-label="考勤分页">
+                <ul class="pagination pagination-farm">
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === 1 }"
+                  >
+                    <button
+                      type="button"
                       class="page-link"
-                      href="#"
-                      aria-label="Previous"
                       @click="doPage(1)"
+                      :disabled="pageBody1.page === 1"
                     >
-                      <span aria-hidden="true">&laquo;</span>
-                      <span class="sr-only">Previous</span>
-                    </a>
+                      <i class="bi bi-chevron-double-left"></i>
+                    </button>
                   </li>
                   <li
                     v-for="(page, index) in pageBody1.pageList"
                     :key="index"
-                    :class="
-                      pageBody1.page == page ? 'page-item active' : 'page-item'
-                    "
+                    class="page-item"
+                    :class="{ active: pageBody1.page === page }"
                   >
-                    <a class="page-link" href="#" @click="doPage(page)">
-                      {{ page }}
-                    </a>
-                  </li>
-                  <li class="page-item">
-                    <a
+                    <button
+                      type="button"
                       class="page-link"
-                      href="#"
-                      aria-label="Next"
-                      @click="doPage(pageBody1.pages)"
+                      @click="doPage(page)"
                     >
-                      <span aria-hidden="true">&raquo;</span>
-                      <span class="sr-only">Next</span>
-                    </a>
+                      {{ page }}
+                    </button>
+                  </li>
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === pageBody1.pages }"
+                  >
+                    <button
+                      type="button"
+                      class="page-link"
+                      @click="doPage(pageBody1.pages)"
+                      :disabled="pageBody1.page === pageBody1.pages"
+                    >
+                      <i class="bi bi-chevron-double-right"></i>
+                    </button>
                   </li>
                 </ul>
               </nav>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 页脚 -->
+    <footerNavbar />
   </div>
 </template>
 
 <script>
 import bus from "@/util/Bus";
-// import moment from "moment";
 import {
   initAttendance,
   updateAttendance,
   chooseDate
 } from "@/api/supermanager.js";
+import superManagerNavbar from "@/components/Header/SuperManagerNavbar.vue";
+import footerNavbar from "@/components/FooterNavbar.vue";
 
 export default {
   name: "Attendance",
-  data: () => ({
-    choosedDate: new Date(),
-    attendanceList: [],
-    attendanceList1: [],
-    pageBody1: {
-      page: null,
-      pages: null,
-      pageList: []
-    },
-    workingHoursList: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-  }),
+  components: {
+    superManagerNavbar,
+    footerNavbar
+  },
+  data() {
+    return {
+      choosedDate: new Date(),
+      attendanceList: [],
+      attendanceList1: [],
+      pageBody1: {
+        page: 1,
+        pages: 1,
+        pageList: []
+      },
+      workingHoursList: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    };
+  },
+  computed: {
+    formattedDate: {
+      get() {
+        const year = this.choosedDate.getFullYear();
+        const month = String(this.choosedDate.getMonth() + 1).padStart(2, "0");
+        const day = String(this.choosedDate.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      },
+      set(value) {
+        this.choosedDate = new Date(value);
+      }
+    }
+  },
   methods: {
     updateAttendance() {
-      let con = confirm(`是否提交更改？`);
-      if (con == true) {
+      if (confirm(`是否提交更改？`)) {
         updateAttendance(this.attendanceList, this.choosedDate);
       }
     },
@@ -215,21 +268,110 @@ export default {
     }
   },
   created() {
-    initAttendance();
+    initAttendance(this.choosedDate);
+
     bus.$on(bus.attendanceList, data => {
-      this.attendanceList = data;
-    });
-    bus.$on(bus.attendanceList1, data => {
-      this.attendanceList1 = data;
+      this.attendanceList = data || [];
+      this.doPage(1);
     });
     bus.$on(bus.pageBody1, data => {
-      this.pageBody1 = data;
+      this.pageBody1 = data || { page: 1, pages: 1, pageList: [] };
     });
   },
   beforeDestroy() {
     bus.$off(bus.attendanceList);
-    bus.$off(bus.attendanceList1);
     bus.$off(bus.pageBody1);
   }
 };
 </script>
+
+<style scoped>
+.date-selection-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid var(--farm-border-light);
+}
+
+.form-label-farm {
+  font-weight: 600;
+  color: var(--farm-green-dark);
+  margin-bottom: 0.5rem;
+}
+
+.form-control-farm {
+  border: 2px solid var(--farm-border-light);
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control-farm:focus {
+  border-color: var(--farm-green);
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.table-farm thead {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.table-row-hover:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.05),
+    rgba(129, 199, 132, 0.05)
+  );
+}
+
+.btn-farm-primary {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.btn-farm-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, var(--farm-green-dark), #2e7d32);
+}
+
+.pagination-farm {
+  --bs-pagination-color: var(--farm-green-dark);
+  --bs-pagination-border-color: var(--farm-border-light);
+  --bs-pagination-hover-color: white;
+  --bs-pagination-hover-bg: var(--farm-green);
+  --bs-pagination-active-bg: var(--farm-green-dark);
+}
+
+@media (max-width: 768px) {
+  .card-farm {
+    padding: 1.5rem !important;
+  }
+
+  .farm-title {
+    font-size: 1.5rem;
+  }
+
+  .date-selection-section .row > div {
+    margin-bottom: 1rem;
+  }
+
+  .date-selection-section .row > div:last-child {
+    margin-bottom: 0;
+  }
+}
+</style>

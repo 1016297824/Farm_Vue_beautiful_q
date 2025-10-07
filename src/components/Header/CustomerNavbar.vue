@@ -1,47 +1,80 @@
-// 顾客导航 - 绿色主题
+// 顾客导航 - 农场主题
 <template>
-  <div id="navbar" class="fixed-top shadow-md">
-    <nav class="navbar navbar-expand-lg" style="height:60px; background: linear-gradient(90deg, #2e7d32 0%, #4caf50 100%);">
+  <div id="navbar" class="fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-farm">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1 d-flex items-center">
-          <img src="@/assets/imgs/Windows12.jpg" width="36" height="36" alt="" class="mr-2 rounded-full shadow-md"/>
-          <span class="text-white font-weight-bold" style="font-size: 1.2rem; letter-spacing: 0.5px;">西塘草舍农场</span>
-        </span>
-        
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-          <ul class="nav navbar-nav">
-            <li class="nav-item mx-1">
-              <a class="nav-link text-white" href="reserve" v-bind:class="{ 'nav-link-active': currentPath === '/customer/reserve' }">
-                <i class="fas fa-calendar-alt mr-1"></i>预定
-              </a>
+        <!-- 品牌Logo -->
+        <a class="navbar-brand-farm" href="#">
+          <div class="farm-logo"></div>
+          <span>西塘草舍农场</span>
+        </a>
+
+        <!-- 移动端折叠按钮 -->
+        <button
+          class="navbar-toggler border-0"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          @click="toggleMobileNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- 导航菜单 -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto navbar-nav-farm">
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                to="/customer/reserve"
+                :class="{ active: $route.path === '/customer/reserve' }"
+              >
+                <i class="bi bi-calendar-check me-1"></i>预定
+              </router-link>
             </li>
-            <li class="nav-item mx-1">
-              <a class="nav-link text-white" href="order" v-bind:class="{ 'nav-link-active': currentPath === '/customer/order' }">
-                <i class="fas fa-utensils mr-1"></i>点餐
-              </a>
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                to="/customer/order"
+                :class="{ active: $route.path === '/customer/order' }"
+              >
+                <i class="bi bi-cart me-1"></i>点餐
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link
+                class="nav-link"
+                to="/customer/purchase"
+                :class="{ active: $route.path === '/customer/purchase' }"
+              >
+                <i class="bi bi-bag me-1"></i>采购
+              </router-link>
             </li>
             <li class="nav-item dropdown">
               <a
-                class="nav-link dropdown-toggle text-white"
-                data-toggle="dropdown"
+                class="nav-link dropdown-toggle"
                 href="#"
+                id="navbarDropdown"
                 role="button"
-                aria-haspopup="true"
+                data-bs-toggle="dropdown"
                 aria-expanded="false"
-                style="display: flex; align-items: center;"
               >
-                <i class="fas fa-user-circle mr-1"></i><span> {{ username }} </span>
+                <i class="bi bi-person-circle me-1"></i>{{ username }}
               </a>
-              <ul class="dropdown-menu dropdown-menu-right shadow-lg" style="border-radius: 8px; overflow: hidden; margin-top: 8px;">
+              <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                  <a class="dropdown-item" href="password"> 
-                    <i class="fas fa-key mr-2"></i>修改密码 
-                  </a>
+                  <router-link class="dropdown-item" to="/customer/password">
+                    <i class="bi bi-key me-2"></i>修改密码
+                  </router-link>
                 </li>
-                <div class="dropdown-divider"></div>
+                <li><hr class="dropdown-divider" /></li>
                 <li>
-                  <a class="dropdown-item text-danger" @click="loginOut"> 
-                    <i class="fas fa-sign-out-alt mr-2"></i>退出登录 
+                  <a
+                    class="dropdown-item text-danger"
+                    @click="loginOut"
+                    href="#"
+                  >
+                    <i class="bi bi-box-arrow-right me-2"></i>退出登录
                   </a>
                 </li>
               </ul>
@@ -56,102 +89,149 @@
 <script>
 export default {
   name: "CustomerNavbar",
-  data: () => ({
-    username: sessionStorage.getItem("username"),
-    currentPath: ''
-  }),
-  mounted() {
-    this.currentPath = this.$route.path;
-    this.$router.afterEach((to) => {
-      this.currentPath = to.path;
-    });
+  data() {
+    return {
+      username: sessionStorage.getItem("username") || "用户"
+    };
   },
   methods: {
-    loginOut: function() {
-      // 添加退出动画
-      const navbar = document.getElementById('navbar');
-      navbar.style.transition = 'all 0.3s ease';
-      navbar.style.transform = 'translateY(-100%)';
-      
-      setTimeout(() => {
-        this.$router.replace("/login");
-      }, 300);
+    toggleMobileNav() {
+      const navbarNav = document.getElementById("navbarNav");
+      if (navbarNav) {
+        navbarNav.classList.toggle("show");
+      }
+    },
+
+    async loginOut() {
+      try {
+        // 显示确认对话框
+        if (!confirm("确定要退出登录吗？")) {
+          return;
+        }
+
+        // 添加退出动画
+        const navbar = document.getElementById("navbar");
+        if (navbar) {
+          navbar.style.transition = "all 0.3s ease";
+          navbar.style.transform = "translateY(-100%)";
+        }
+
+        // 清除session
+        sessionStorage.removeItem("username");
+
+        // 显示退出消息
+        this.$farmMessage.success("已安全退出登录");
+
+        // 延迟跳转
+        setTimeout(() => {
+          this.$router.replace("/login");
+        }, 300);
+      } catch (error) {
+        console.error("退出登录失败:", error);
+        this.$farmMessage.error("退出登录失败");
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-/* 导航链接样式 */
-.nav-link {
-  transition: all 0.3s ease;
-  padding: 10px 16px !important;
-  border-radius: 6px;
-  position: relative;
-  overflow: hidden;
+/* 自定义汉堡菜单按钮 */
+.navbar-toggler {
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  border: none !important;
+  outline: none;
 }
 
-.nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
+.navbar-toggler:focus {
+  box-shadow: none;
 }
 
-/* 激活链接样式 */
-.nav-link-active {
-  background-color: rgba(255, 255, 255, 0.25) !important;
-  font-weight: 600;
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-/* 下拉菜单样式 */
+/* 下拉菜单增强 */
+.dropdown-menu {
+  border-radius: 0.75rem;
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  margin-top: 0.5rem;
+  background: white;
+}
+
 .dropdown-item {
-  transition: all 0.3s ease;
-  padding: 10px 20px;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+  border-radius: 0.5rem;
+  margin: 0.25rem 0.5rem;
 }
 
 .dropdown-item:hover {
-  background-color: #f1f8e9 !important;
+  background-color: var(--farm-green-50);
+  color: var(--farm-green-700);
   transform: translateX(4px);
 }
 
-/* 品牌标志样式 */
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  transition: all 0.3s ease;
+.dropdown-item.text-danger:hover {
+  background-color: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
 }
 
-.navbar-brand:hover {
-  transform: scale(1.02);
+.dropdown-divider {
+  margin: 0.5rem 0;
+  border-color: var(--farm-green-200);
 }
 
-/* 响应式设计 */
+/* 响应式调整 */
 @media (max-width: 768px) {
-  .navbar {
-    height: auto !important;
+  .navbar-collapse {
+    background: var(--farm-green-600);
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
   }
-  
-  .nav-item {
-    margin: 2px 0 !important;
+
+  .navbar-nav .nav-link {
+    padding: 0.75rem 1rem;
+    margin: 0.25rem 0;
+    border-radius: 0.5rem;
   }
-  
-  .navbar-nav {
-    margin-top: 10px !important;
-    margin-bottom: 10px !important;
+
+  .navbar-brand-farm span {
+    font-size: 1rem;
   }
-  
+
+  .farm-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .farm-logo::before {
+    font-size: 16px;
+  }
+
   .dropdown-menu {
-    margin-top: 0 !important;
+    margin-top: 0;
+    border-radius: 0.5rem;
   }
 }
 
 @media (max-width: 576px) {
-  .navbar-brand img {
-    width: 30px !important;
-    height: 30px !important;
+  .navbar {
+    padding: 0.5rem 1rem;
   }
-  
-  .navbar-brand span {
-    font-size: 1rem !important;
+
+  .navbar-brand-farm {
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .navbar-toggler {
+    display: none;
   }
 }
 </style>

@@ -1,331 +1,425 @@
-// 餐厅员工结账
 <template>
-  <div class="container">
-    <!-- 主体 -->
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="col-lg-8 m-auto">
-          <br />
-          <br />
-          <br />
-          <br />
-          <br />
-          <form action="">
-            <div class="form-group text-left">
-              <label for="" class="font-weight-bold">顾客订单</label>
+  <div>
+    <!-- 导航栏 -->
+    <restaurantStaffNavbar />
+
+    <!-- 主体内容 -->
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
+      <div class="row justify-content-center">
+        <div class="col-xl-10">
+          <div class="card-farm p-4">
+            <!-- 页面标题 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h2 class="farm-title mb-2">
+                  <i class="bi bi-receipt me-2"></i>顾客订单管理
+                </h2>
+                <p class="text-muted mb-0">查看和处理顾客订单</p>
+              </div>
             </div>
-            <hr />
-            <br />
-            <table class="table table-borderless">
-              <thead>
-                <tr>
-                  <th style="text-align: center;" class="text-truncate">
-                    订单号
-                  </th>
-                  <th style="text-align: center;" class="text-truncate">
-                    桌位
-                  </th>
-                  <th style="text-align: center;" class="text-truncate">
-                    顾客姓名
-                  </th>
-                  <th></th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(reserve, index) in reserveList" :key="index">
-                  <td style="text-align: center;" class="text-truncate">
-                    {{ reserve.no }}
-                  </td>
-                  <td style="text-align: center;" class="text-truncate">
-                    {{ reserve.diningTable.id }}
-                  </td>
-                  <td style="text-align: center;" class="text-truncate">
-                    {{ reserve.customer.name }}
-                  </td>
-                  <td style="text-align: center;" class="text-truncate">
-                    <a
-                      href="#"
-                      data-toggle="modal"
-                      data-target="#order"
-                      @click="getOrdering(reserve.no)"
-                    >
-                      查看
-                    </a>
-                  </td>
-                  <td>
-                    <input
+
+            <!-- 顾客订单表格 -->
+            <div class="table-responsive">
+              <table class="table table-farm">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      <i class="bi bi-hash me-1"></i>订单号
+                    </th>
+                    <th class="text-center">
+                      <i class="bi bi-table me-1"></i>桌位
+                    </th>
+                    <th class="text-center">
+                      <i class="bi bi-person me-1"></i>顾客姓名
+                    </th>
+                    <th class="text-center">
+                      <i class="bi bi-eye me-1"></i>操作
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(reserve, index) in reserveList"
+                    :key="index"
+                    class="table-row-hover"
+                  >
+                    <td class="text-center fw-bold text-farm-primary">
+                      {{ reserve.no }}
+                    </td>
+                    <td class="text-center">
+                      {{ reserve.diningTable.id }}号桌
+                    </td>
+                    <td class="text-center">
+                      {{ reserve.customer.name }}
+                    </td>
+                    <td class="text-center">
+                      <div class="btn-group" role="group">
+                        <button
+                          type="button"
+                          class="btn btn-outline-primary btn-sm me-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#orderModal"
+                          @click="getOrdering(reserve.no)"
+                        >
+                          <i class="bi bi-eye me-1"></i>查看
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-danger btn-sm"
+                          @click="deleteReserve(reserve.no)"
+                        >
+                          <i class="bi bi-trash me-1"></i>取消订单
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="reserveList.length === 0">
+                    <td colspan="4" class="text-center text-muted py-4">
+                      <i class="bi bi-receipt me-2"></i>暂无顾客订单
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 分页器 -->
+            <div
+              class="d-flex justify-content-center"
+              v-if="pageBody1.pageList && pageBody1.pageList.length > 1"
+            >
+              <nav aria-label="订单分页">
+                <ul class="pagination pagination-farm">
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === 1 }"
+                  >
+                    <button
                       type="button"
-                      value="取消订单"
-                      class="btn btn-light"
-                      @click="deleteReserve(reserve.no)"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <nav aria-label="Page navigation">
-              <ul class="pagination">
-                <li class="page-item">
-                  <a
-                    class="page-link"
-                    href="#"
-                    aria-label="Previous"
-                    @click="doPage(1)"
+                      class="page-link"
+                      @click="doPage(1)"
+                      :disabled="pageBody1.page === 1"
+                    >
+                      <i class="bi bi-chevron-double-left"></i>
+                    </button>
+                  </li>
+                  <li
+                    v-for="(page, index) in pageBody1.pageList"
+                    :key="index"
+                    class="page-item"
+                    :class="{ active: pageBody1.page === page }"
                   >
-                    <span aria-hidden="true">&laquo;</span>
-                    <span class="sr-only">Previous</span>
-                  </a>
-                </li>
-                <li
-                  v-for="(page, index) in pageBody1.pageList"
-                  :key="index"
-                  :class="
-                    pageBody1.page == page ? 'page-item active' : 'page-item'
-                  "
-                >
-                  <a class="page-link" href="#" @click="doPage(page)">
-                    {{ page }}
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a
-                    class="page-link"
-                    href="#"
-                    aria-label="Next"
-                    @click="doPage(pageBody1.pages)"
+                    <button
+                      type="button"
+                      class="page-link"
+                      @click="doPage(page)"
+                    >
+                      {{ page }}
+                    </button>
+                  </li>
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === pageBody1.pages }"
                   >
-                    <span aria-hidden="true">&raquo;</span>
-                    <span class="sr-only">Next</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </form>
+                    <button
+                      type="button"
+                      class="page-link"
+                      @click="doPage(pageBody1.pages)"
+                      :disabled="pageBody1.page === pageBody1.pages"
+                    >
+                      <i class="bi bi-chevron-double-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- model -->
+    <!-- 订单详情模态框 -->
     <div
       class="modal fade"
-      id="order"
+      id="orderModal"
       tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
+      aria-labelledby="orderModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content modal-farm">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              订单详情
+            <h5 class="modal-title" id="orderModalLabel">
+              <i class="bi bi-receipt me-2"></i>订单详情
             </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body" id="pageProduct">
-                <p v-show="orderingList.length == 0">无</p>
-                <table
-                  class="table table-borderless"
-                  v-show="orderingList.length != 0"
-                >
-                  <thead>
-                    <tr>
-                      <th style="text-align: center;" class="text-truncate">
-                        菜名
-                      </th>
-                      <th style="text-align: center;" class="text-truncate">
-                        份数
-                      </th>
-                      <th style="text-align: center;" class="text-truncate">
-                        单价
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(ordering, index) in orderingList" :key="index">
-                      <td class="text-truncate text-center">
-                        {{ ordering.menu.name }}
-                      </td>
-                      <td
-                        class="text-truncate text-center"
-                        style="text-align: center;"
+            <div class="order-details">
+              <div
+                v-if="orderingList.length === 0"
+                class="text-center py-4 text-muted"
+              >
+                <i class="bi bi-receipt me-2"></i>暂无订单详情
+              </div>
+              <div v-else>
+                <div class="table-responsive">
+                  <table class="table table-farm">
+                    <thead>
+                      <tr>
+                        <th class="text-center">
+                          <i class="bi bi-egg-fried me-1"></i>菜名
+                        </th>
+                        <th class="text-center">
+                          <i class="bi bi-hash me-1"></i>份数
+                        </th>
+                        <th class="text-center">
+                          <i class="bi bi-cash me-1"></i>单价
+                        </th>
+                        <th class="text-center">
+                          <i class="bi bi-calculator me-1"></i>小计
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="(ordering, index) in orderingList"
+                        :key="index"
                       >
-                        {{ ordering.count }}
-                      </td>
-                      <td class="text-truncate text-center">
-                        {{ ordering.menu.price | numFilter }}
-                        {{ ordering.menu.unite + "/份" }}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td class="text-center font-weight-bold">
-                        合计
-                      </td>
-                      <td class="text-center font-weight-bold">
-                        {{ totalPrice | numFilter }} {{ "元" }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                        <td class="text-center fw-bold text-farm-primary">
+                          {{ ordering.menu.name }}
+                        </td>
+                        <td class="text-center">
+                          {{ ordering.count }}
+                        </td>
+                        <td class="text-center">
+                          ¥{{ ordering.menu.price | numFilter }}
+                        </td>
+                        <td class="text-center">
+                          ¥{{
+                            (ordering.menu.price * ordering.count) | numFilter
+                          }}
+                        </td>
+                      </tr>
+                      <tr class="total-row">
+                        <td
+                          colspan="3"
+                          class="text-center fw-bold text-farm-primary"
+                        >
+                          <i class="bi bi-calculator me-1"></i>合计
+                        </td>
+                        <td class="text-center">
+                          <span class="total-price"
+                            >¥{{ totalPrice | numFilter }}</span
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="结账"
-                class="btn btn-primary"
-                :disabled="orderingList.length == 0"
-                @click="settleAccounts"
-              />
-            </div>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bi bi-x-circle me-2"></i>关闭
+            </button>
+            <button
+              type="button"
+              class="btn btn-farm-success"
+              :disabled="orderingList.length === 0"
+              @click="settleAccounts"
+            >
+              <i class="bi bi-cash-stack me-2"></i>结账
+            </button>
           </div>
         </div>
       </div>
     </div>
-    <br />
-    <br />
-    <br />
+
+    <!-- 页脚 -->
+    <footerNavbar />
   </div>
 </template>
 
 <script>
 import bus from "@/util/Bus";
 import {
-  getReserve,
+  getReserve as getReserveList,
   doPage,
-  deleteReserve,
   getOrdering,
+  deleteReserve,
   settleAccounts
 } from "@/api/restaurantStaff.js";
-import $ from "jquery";
+import restaurantStaffNavbar from "@/components/Header/RestaurantStaffNavbar.vue";
+import footerNavbar from "@/components/FooterNavbar.vue";
 
 export default {
   name: "SettleAccounts",
-  data: () => ({
-    reserveList: null,
-    orderingList: [],
-    reserveNo: null,
-    pageBody1: {
-      page: null,
-      pages: null,
-      pageList: []
+  components: {
+    restaurantStaffNavbar,
+    footerNavbar
+  },
+  data() {
+    return {
+      reserveList: [],
+      pageBody1: {
+        page: 1,
+        pages: 1,
+        pageList: []
+      },
+      orderingList: [],
+      totalPrice: 0
+    };
+  },
+  filters: {
+    numFilter(value) {
+      if (!value) return "0.00";
+      return parseFloat(value).toFixed(2);
     }
-  }),
+  },
   methods: {
+    doPage(page) {
+      doPage(page);
+    },
     getOrdering(no) {
-      this.reserveNo = no;
       getOrdering(no);
     },
-    doPage(page) {
-      this.pageBody1.page = page;
-      doPage(this.pageBody1);
-    },
     deleteReserve(no) {
-      let con = confirm(`取消订单：\n订单号：${no}`);
-      if (con == true) {
+      if (confirm(`确定要取消订单号为 ${no} 的订单吗？`)) {
         deleteReserve(no);
       }
     },
     settleAccounts() {
-      let con = confirm(`结账：\n订单号：${this.reserveNo}`);
-      if (con == true) {
-        settleAccounts(this.reserveNo);
-        $("#order").modal("hide");
+      if (this.orderingList.length > 0) {
+        if (
+          confirm(
+            `确定要为该订单结账吗？\n\n合计金额：¥${this.totalPrice.toFixed(2)}`
+          )
+        ) {
+          settleAccounts();
+
+          // 关闭模态框
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("orderModal")
+          );
+          if (modal) modal.hide();
+        }
       }
-    },
-    accMul(arg1, arg2) {
-      var m = 0,
-        s1 = arg1.toString(),
-        s2 = arg2.toString();
-      try {
-        m += s1.split(".")[1].length;
-      } catch (e) {
-        console.log("error");
-      }
-      try {
-        m += s2.split(".")[1].length;
-      } catch (e) {
-        console.log("error");
-      }
-      return (
-        (Number(s1.replace(".", "")) * Number(s2.replace(".", ""))) /
-        Math.pow(10, m)
-      );
-    },
-    accAdd(arg1, arg2) {
-      var r1, r2, m;
-      try {
-        r1 = arg1.toString().split(".")[1].length;
-      } catch (e) {
-        r1 = 0;
-      }
-      try {
-        r2 = arg2.toString().split(".")[1].length;
-      } catch (e) {
-        r2 = 0;
-      }
-      m = Math.pow(10, Math.max(r1, r2));
-      return (arg1 * m + arg2 * m) / m;
     }
   },
   created() {
-    getReserve();
+    getReserveList();
+
     bus.$on(bus.reserveList, data => {
-      this.reserveList = data;
-    });
-    bus.$on(bus.orderingList, data => {
-      this.orderingList = data;
+      this.reserveList = data || [];
     });
     bus.$on(bus.pageBody1, data => {
-      this.pageBody1 = data;
+      this.pageBody1 = data || { page: 1, pages: 1, pageList: [] };
     });
-  },
-  computed: {
-    totalPrice: function() {
-      let totalPrice = 0;
-      if (this.orderingList.length != 0) {
-        for (let i = 0; i < this.orderingList.length; i++) {
-          let tp = this.accMul(
-            this.orderingList[i].count,
-            this.orderingList[i].menu.price
-          );
-          totalPrice = this.accAdd(totalPrice, tp);
-        }
-        return totalPrice.toFixed(2);
-      } else {
-        return null;
-      }
-    }
-  },
-  filters: {
-    numFilter(value) {
-      let realVal = "";
-      if (!isNaN(value) && value !== "") {
-        // 截取当前数据到小数点后两位
-        realVal = parseFloat(value).toFixed(2);
-      } else {
-        realVal = "--";
-      }
-      return realVal;
-    }
+    bus.$on(bus.orderingList, data => {
+      this.orderingList = data || [];
+
+      // 计算总价
+      this.totalPrice = this.orderingList.reduce((total, ordering) => {
+        return total + ordering.menu.price * ordering.count;
+      }, 0);
+    });
   },
   beforeDestroy() {
     bus.$off(bus.reserveList);
-    bus.$off(bus.orderingList);
     bus.$off(bus.pageBody1);
+    bus.$off(bus.orderingList);
   }
 };
 </script>
+
+<style scoped>
+.table-farm thead {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.table-row-hover:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.05),
+    rgba(129, 199, 132, 0.05)
+  );
+}
+
+.total-row {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.1),
+    rgba(129, 199, 132, 0.1)
+  );
+  font-weight: 600;
+}
+
+.total-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--farm-green-dark);
+}
+
+.modal-farm .modal-header {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.pagination-farm {
+  --bs-pagination-color: var(--farm-green-dark);
+  --bs-pagination-border-color: var(--farm-border-light);
+  --bs-pagination-hover-color: white;
+  --bs-pagination-hover-bg: var(--farm-green);
+  --bs-pagination-active-bg: var(--farm-green-dark);
+}
+
+.btn-farm-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-farm-success:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(40, 167, 69, 0.4);
+  background: linear-gradient(135deg, #20c997, #17a2b8);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .card-farm {
+    padding: 1.5rem !important;
+  }
+
+  .farm-title {
+    font-size: 1.5rem;
+  }
+
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+}
+</style>

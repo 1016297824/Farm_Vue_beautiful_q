@@ -1,187 +1,515 @@
 // 添加员工
 <template>
-  <div class="container">
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="col-lg-12">
-          <div class="col-lg-4 m-auto">
-            <form action="">
-              <input
-                type="text"
-                class="form-control"
-                style="position:fixed;bottom:-9999px;"
-              />
-              <input
-                type="password"
-                class="form-control"
-                style="position:fixed;bottom:-9999px;"
-              />
-              <div class="form-group text-left">
-                <label for="">姓名</label>
+  <div>
+    <!-- 导航栏 -->
+    <restaurantManagerNavbar />
+
+    <!-- 主体内容 -->
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
+      <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+          <div class="card-farm p-4">
+            <!-- 页面标题 -->
+            <div class="text-center mb-4">
+              <h2 class="farm-title mb-2">
+                <i class="bi bi-person-plus-fill me-2"></i>添加餐厅员工
+              </h2>
+              <p class="text-muted">填写员工基本信息，所有字段都是必填项</p>
+            </div>
+
+            <!-- 员工信息表单 -->
+            <form @submit.prevent="addStaff">
+              <!-- 隐藏的自动填充防止字段 -->
+              <input type="text" style="display:none;" autocomplete="off" />
+              <input type="password" style="display:none;" autocomplete="off" />
+
+              <!-- 姓名 -->
+              <div class="mb-3">
+                <label class="form-label-farm required">
+                  <i class="bi bi-person me-1"></i>姓名
+                </label>
                 <input
                   type="text"
-                  class="form-control"
+                  class="form-control form-control-farm"
+                  :class="{
+                    'is-invalid': nameMessage,
+                    'is-valid': staff.name && !nameMessage
+                  }"
                   v-model="staff.name"
-                  @keyup="writeName"
+                  @input="validateName"
+                  placeholder="请输入员工姓名"
+                  autocomplete="off"
+                  required
                 />
-                <p style="color: red;">
-                  {{ nameMessage }}
-                </p>
+                <div v-if="nameMessage" class="text-danger mt-1">
+                  <i class="bi bi-exclamation-triangle me-1"></i
+                  >{{ nameMessage }}
+                </div>
               </div>
-              <div class="form-group text-left">
-                <label for="">身份证号</label>
+
+              <!-- 身份证号 -->
+              <div class="mb-3">
+                <label class="form-label-farm required">
+                  <i class="bi bi-card-text me-1"></i>身份证号
+                </label>
                 <input
                   type="text"
-                  class="form-control"
+                  class="form-control form-control-farm"
+                  :class="{
+                    'is-invalid': idCardNoMessage,
+                    'is-valid': staff.idCardNo && !idCardNoMessage
+                  }"
                   v-model="staff.idCardNo"
-                  @keyup="writeIdCardNo"
+                  @input="validateIdCardNo"
+                  placeholder="请输入18位身份证号码"
+                  maxlength="18"
+                  autocomplete="off"
+                  required
                 />
-                <p style="color: red;">
-                  {{ idCardNoMessage }}
-                </p>
+                <div v-if="idCardNoMessage" class="text-danger mt-1">
+                  <i class="bi bi-exclamation-triangle me-1"></i
+                  >{{ idCardNoMessage }}
+                </div>
               </div>
-              <div class="form-group text-left">
-                <label for="">电话号码</label>
+
+              <!-- 电话号码 -->
+              <div class="mb-3">
+                <label class="form-label-farm required">
+                  <i class="bi bi-telephone me-1"></i>电话号码
+                </label>
                 <input
-                  type="text"
-                  class="form-control"
+                  type="tel"
+                  class="form-control form-control-farm"
+                  :class="{
+                    'is-invalid': telNumberMessage,
+                    'is-valid': staff.telNumber && !telNumberMessage
+                  }"
                   v-model="staff.telNumber"
-                  @keyup="writeTelNumber"
+                  @input="validateTelNumber"
+                  placeholder="请输入11位手机号码"
+                  maxlength="11"
+                  autocomplete="off"
+                  required
                 />
-                <p style="color: red;">
-                  {{ telNumberMessage }}
-                </p>
+                <div v-if="telNumberMessage" class="text-danger mt-1">
+                  <i class="bi bi-exclamation-triangle me-1"></i
+                  >{{ telNumberMessage }}
+                </div>
               </div>
-              <div class="form-group text-left">
-                <label for="">邮箱</label>
+
+              <!-- 邮箱 -->
+              <div class="mb-3">
+                <label class="form-label-farm required">
+                  <i class="bi bi-envelope me-1"></i>邮箱地址
+                </label>
                 <input
-                  type="text"
-                  class="form-control"
+                  type="email"
+                  class="form-control form-control-farm"
+                  :class="{
+                    'is-invalid': emailMessage,
+                    'is-valid': staff.email && !emailMessage
+                  }"
                   v-model="staff.email"
-                  @keyup="writeEmail"
+                  @input="validateEmail"
+                  placeholder="请输入邮箱地址，如：zhangsan@restaurant.com"
+                  autocomplete="off"
+                  required
                 />
-                <p style="color: red;">
-                  {{ emailMessage }}
-                </p>
+                <div v-if="emailMessage" class="text-danger mt-1">
+                  <i class="bi bi-exclamation-triangle me-1"></i
+                  >{{ emailMessage }}
+                </div>
               </div>
-              <div class="form-group text-left">
-                <label for="">住址</label>
-                <input
-                  type="text"
-                  class="form-control"
+
+              <!-- 住址 -->
+              <div class="mb-4">
+                <label class="form-label-farm required">
+                  <i class="bi bi-geo-alt me-1"></i>家庭住址
+                </label>
+                <textarea
+                  class="form-control form-control-farm"
+                  :class="{
+                    'is-invalid': addressMessage,
+                    'is-valid': staff.address && !addressMessage
+                  }"
                   v-model="staff.address"
-                  @keyup="writeAddress"
-                />
-                <p style="color: red;">
-                  {{ addressMessage }}
-                </p>
+                  @input="validateAddress"
+                  placeholder="请输入详细家庭住址"
+                  rows="3"
+                  autocomplete="off"
+                  required
+                ></textarea>
+                <div v-if="addressMessage" class="text-danger mt-1">
+                  <i class="bi bi-exclamation-triangle me-1"></i
+                  >{{ addressMessage }}
+                </div>
               </div>
-              <div class="col-lg-12" style="text-align:center">
-                <input
-                  type="button"
-                  value="添加"
-                  class="btn btn-primary"
-                  @click="addStaff"
-                />
+
+              <!-- 提交按钮组 -->
+              <div class="d-grid gap-2">
+                <button
+                  type="submit"
+                  class="btn btn-farm-primary btn-lg"
+                  :disabled="isSubmitting || !isFormValid"
+                >
+                  <span v-if="isSubmitting">
+                    <i class="bi bi-arrow-clockwise me-2 spin"></i>添加中...
+                  </span>
+                  <span v-else>
+                    <i class="bi bi-person-plus me-2"></i>添加员工
+                  </span>
+                </button>
+                <div class="row g-2">
+                  <div class="col">
+                    <button
+                      type="button"
+                      class="btn btn-outline-secondary w-100"
+                      @click="resetForm"
+                    >
+                      <i class="bi bi-arrow-clockwise me-2"></i>重置表单
+                    </button>
+                  </div>
+                  <div class="col">
+                    <button
+                      type="button"
+                      class="btn btn-outline-primary w-100"
+                      @click="goBack"
+                    >
+                      <i class="bi bi-arrow-left me-2"></i>返回列表
+                    </button>
+                  </div>
+                </div>
               </div>
             </form>
           </div>
         </div>
       </div>
     </div>
-    <br />
-    <br />
-    <br />
+
+    <!-- 页脚 -->
+    <footerNavbar />
   </div>
 </template>
 
 <script>
 import { addStaff } from "@/api/restaurantManager";
+import restaurantManagerNavbar from "@/components/Header/RestaurantManagerNavbar.vue";
+import footerNavbar from "@/components/FooterNavbar.vue";
 
 export default {
-  name: "StaffAdd",
-  data: () => ({
-    staff: {
-      name: null,
-      idCardNo: null,
-      telNumber: null,
-      email: null,
-      address: null
-    },
-    nameMessage: null,
-    idCardNoMessage: null,
-    telNumberMessage: null,
-    emailMessage: null,
-    addressMessage: null
-  }),
+  name: "StaffAdd2",
+  components: {
+    restaurantManagerNavbar,
+    footerNavbar
+  },
+  data() {
+    return {
+      staff: {
+        name: "",
+        idCardNo: "",
+        telNumber: "",
+        email: "",
+        address: ""
+      },
+      nameMessage: null,
+      idCardNoMessage: null,
+      telNumberMessage: null,
+      emailMessage: null,
+      addressMessage: null,
+      isSubmitting: false
+    };
+  },
+  computed: {
+    isFormValid() {
+      return (
+        this.staff.name.trim() &&
+        this.staff.idCardNo.trim() &&
+        this.staff.telNumber.trim() &&
+        this.staff.email.trim() &&
+        this.staff.address.trim() &&
+        !this.nameMessage &&
+        !this.idCardNoMessage &&
+        !this.telNumberMessage &&
+        !this.emailMessage &&
+        !this.addressMessage
+      );
+    }
+  },
+  mounted() {
+    this.animatePageEntry();
+  },
   methods: {
-    addStaff() {
-      if (
-        this.staff.name == null ||
-        this.staff.idCardNo == null ||
-        this.staff.telNumber == null ||
-        this.staff.email == null ||
-        this.staff.address == null
-      ) {
-        if (this.staff.name == null) {
-          this.nameMessage = "姓名不能为空！";
-        }
-        if (this.staff.idCardNo == null) {
-          this.idCardNoMessage = "身份证号不能为空！";
-        }
-        if (this.staff.telNumber == null) {
-          this.telNumberMessage = "手机号不能为空！";
-        }
-        if (this.staff.email == null) {
-          this.emailMessage = "邮箱不能为空！";
-        }
-        if (this.staff.address == null) {
-          this.addressMessage = "住址不能为空！";
-        }
-      } else {
-        let result = true;
-        var regEmail = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
-        var regIdCardNo = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/;
-        var regTelNulber = /^(\+86)?1[3456789]\d{9}$/;
-        if (!regEmail.test(this.staff.email)) {
-          result = false;
-          this.emailMessage = "邮箱格式不正确！";
-        }
-        if (!regIdCardNo.test(this.staff.idCardNo)) {
-          result = false;
-          this.idCardNoMessage = "身份证号格式不正确！";
-        }
-        if (!regTelNulber.test(this.staff.telNumber)) {
-          result = false;
-          this.telNumberMessage = "手机号格式不正确！";
-        }
+    async addStaff() {
+      this.clearMessages();
 
-        if (result) {
-          addStaff(this.staff);
-        }
+      if (!this.validateAllFields()) {
+        return;
       }
-      // addStaff(this.staff);
+
+      try {
+        this.isSubmitting = true;
+
+        const staffData = {
+          name: this.staff.name.trim(),
+          idCardNo: this.staff.idCardNo.trim().toUpperCase(),
+          telNumber: this.staff.telNumber.trim(),
+          email: this.staff.email.trim().toLowerCase(),
+          address: this.staff.address.trim()
+        };
+
+        await addStaff(staffData);
+
+        this.showToast(`餐厅员工 ${staffData.name} 添加成功！`, "success");
+
+        setTimeout(() => {
+          this.$router.push("/manager/restaurantManager/staffShow2");
+        }, 1500);
+      } catch (error) {
+        console.error("添加员工失败:", error);
+        this.showToast("添加员工失败，请检查信息后重试", "danger");
+      } finally {
+        this.isSubmitting = false;
+      }
     },
-    writeName() {
+
+    validateAllFields() {
+      let isValid = true;
+
+      if (!this.staff.name.trim()) {
+        this.nameMessage = "请输入员工姓名！";
+        isValid = false;
+      } else if (this.staff.name.trim().length < 2) {
+        this.nameMessage = "姓名至少需要 2 个字符！";
+        isValid = false;
+      }
+
+      if (!this.staff.idCardNo.trim()) {
+        this.idCardNoMessage = "请输入身份证号！";
+        isValid = false;
+      } else if (!this.isValidIdCard(this.staff.idCardNo)) {
+        this.idCardNoMessage = "身份证号格式不正确！";
+        isValid = false;
+      }
+
+      if (!this.staff.telNumber.trim()) {
+        this.telNumberMessage = "请输入手机号码！";
+        isValid = false;
+      } else if (!this.isValidPhone(this.staff.telNumber)) {
+        this.telNumberMessage = "手机号码格式不正确！";
+        isValid = false;
+      }
+
+      if (!this.staff.email.trim()) {
+        this.emailMessage = "请输入邮箱地址！";
+        isValid = false;
+      } else if (!this.isValidEmail(this.staff.email)) {
+        this.emailMessage = "邮箱地址格式不正确！";
+        isValid = false;
+      }
+
+      if (!this.staff.address.trim()) {
+        this.addressMessage = "请输入家庭住址！";
+        isValid = false;
+      } else if (this.staff.address.trim().length < 5) {
+        this.addressMessage = "请输入详细的住址信息！";
+        isValid = false;
+      }
+
+      return isValid;
+    },
+
+    validateName() {
       this.nameMessage = null;
+      const name = this.staff.name.trim();
+
+      if (name && name.length < 2) {
+        this.nameMessage = "姓名至少需要 2 个字符";
+      }
     },
-    writeIdCardNo() {
+
+    validateIdCardNo() {
       this.idCardNoMessage = null;
+      const idCard = this.staff.idCardNo.trim();
+
+      if (idCard && !this.isValidIdCard(idCard)) {
+        this.idCardNoMessage = "请输入正确的 18 位身份证号码";
+      }
     },
-    writeTelNumber() {
+
+    validateTelNumber() {
       this.telNumberMessage = null;
+      const phone = this.staff.telNumber.trim();
+
+      if (phone && !this.isValidPhone(phone)) {
+        this.telNumberMessage = "请输入正确的 11 位手机号码";
+      }
     },
-    writeEmail() {
+
+    validateEmail() {
       this.emailMessage = null;
+      const email = this.staff.email.trim();
+
+      if (email && !this.isValidEmail(email)) {
+        this.emailMessage = "请输入正确的邮箱地址格式";
+      }
     },
-    writeAddress() {
+
+    validateAddress() {
       this.addressMessage = null;
+      const address = this.staff.address.trim();
+
+      if (address && address.length < 5) {
+        this.addressMessage = "请输入详细的住址信息（至少5个字符）";
+      }
+    },
+
+    isValidIdCard(idCard) {
+      const regIdCard = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/;
+      return regIdCard.test(idCard);
+    },
+
+    isValidPhone(phone) {
+      const regPhone = /^1[3-9]\d{9}$/;
+      return regPhone.test(phone);
+    },
+
+    isValidEmail(email) {
+      const regEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      return regEmail.test(email);
+    },
+
+    clearMessages() {
+      this.nameMessage = null;
+      this.idCardNoMessage = null;
+      this.telNumberMessage = null;
+      this.emailMessage = null;
+      this.addressMessage = null;
+    },
+
+    resetForm() {
+      this.staff = {
+        name: "",
+        idCardNo: "",
+        telNumber: "",
+        email: "",
+        address: ""
+      };
+      this.clearMessages();
+      this.showToast("表单已重置", "info");
+    },
+
+    goBack() {
+      this.$router.push("/manager/restaurantManager/staffShow2");
+    },
+
+    animatePageEntry() {
+      const container = document.querySelector(".container");
+      if (container) {
+        container.style.opacity = "0";
+        container.style.transform = "translateY(20px)";
+        container.style.transition = "all 0.6s ease";
+
+        setTimeout(() => {
+          container.style.opacity = "1";
+          container.style.transform = "translateY(0)";
+        }, 100);
+      }
+    },
+
+    showToast(message, type = "info") {
+      const toastContainer =
+        document.querySelector(".toast-container") ||
+        this.createToastContainer();
+
+      const toast = document.createElement("div");
+      toast.className = "toast align-items-center text-white border-0";
+      toast.classList.add(`bg-${type}`);
+      toast.setAttribute("role", "alert");
+      toast.setAttribute("aria-live", "assertive");
+      toast.setAttribute("aria-atomic", "true");
+
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="bi bi-${this.getToastIcon(type)} me-2"></i>${message}
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      `;
+
+      toastContainer.appendChild(toast);
+
+      const bsToast = new bootstrap.Toast(toast, {
+        autohide: true,
+        delay: 3000
+      });
+
+      bsToast.show();
+
+      toast.addEventListener("hidden.bs.toast", () => {
+        toastContainer.removeChild(toast);
+      });
+    },
+
+    createToastContainer() {
+      const container = document.createElement("div");
+      container.className = "toast-container position-fixed top-0 end-0 p-3";
+      container.style.zIndex = "9999";
+      document.body.appendChild(container);
+      return container;
+    },
+
+    getToastIcon(type) {
+      switch (type) {
+        case "success":
+          return "check-circle-fill";
+        case "danger":
+          return "exclamation-triangle-fill";
+        case "warning":
+          return "exclamation-triangle-fill";
+        default:
+          return "info-circle-fill";
+      }
     }
   }
 };
 </script>
+
+<style scoped>
+.required::after {
+  content: " *";
+  color: var(--bs-danger);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.form-control-farm {
+  border: 2px solid var(--farm-primary-light);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  padding: 0.75rem 1rem;
+}
+
+.form-control-farm:focus {
+  border-color: var(--farm-primary);
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.card-farm {
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+</style>

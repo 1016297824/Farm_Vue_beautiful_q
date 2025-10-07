@@ -23,11 +23,13 @@ export function doPage(pageBody1, productType) {
 
 // 修改密码
 export function changePassword(userBodyChangePassword) {
-  axios.post("farmStaff/changePassword", userBodyChangePassword).then(response => {
-    setTimeout(() => {
-      alert(response.data.message);
-    }, 200);
-  });
+  axios
+    .post("farmStaff/changePassword", userBodyChangePassword)
+    .then(response => {
+      setTimeout(() => {
+        alert(response.data.message);
+      }, 200);
+    });
 }
 
 // 添加农产品

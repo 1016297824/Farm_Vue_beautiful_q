@@ -1,1005 +1,409 @@
-// 饲料肥料
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12">
-        <div class="col-lg-12">
-          <div class="col-lg-8 m-auto">
-            <br />
-            <br />
-            <br />
-            <form action="">
-              <div class="form-group text-left">
-                <div class="row">
-                  <div class="col-lg-12">
-                    <div class="row">
-                      <div class="col-lg-2">
-                        <label for="" class="font-weight-bold">选择类型</label>
-                      </div>
-                      <div class="col-lg-3">
-                        <select
-                          class="form-control"
-                          v-model="fertilizerType"
-                          @change="fertilizerTypeChange"
-                        >
-                          <option
-                            v-for="(fertilizerType,
-                            index) in fertilizerTypeList"
-                            :key="index"
-                            :value="fertilizerType"
-                          >
-                            {{ fertilizerType }}
-                          </option>
-                        </select>
-                      </div>
-                      <div class="col-lg-7">
-                        <input
-                          type="button"
-                          class="btn btn-primary"
-                          style="float:right"
-                          value="新建采购信息"
-                          data-toggle="modal"
-                          data-target="#addFertilizer"
-                          @click="addFertilizer"
-                        />
-                      </div>
-                    </div>
-                  </div>
+  <div>
+    <!-- 导航栏 -->
+    <farmStaffNavbar />
+
+    <!-- 主体内容 -->
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
+      <div class="row justify-content-center">
+        <div class="col-xl-12">
+          <div class="card-farm p-4">
+            <!-- 页面标题 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h2 class="farm-title mb-2">
+                  <i class="bi bi-bag-check me-2"></i>{{ fertilizerType }}管理
+                </h2>
+                <p class="text-muted mb-0">
+                  管理农场{{ fertilizerType }}的库存、采购和使用记录
+                </p>
+              </div>
+              <button
+                type="button"
+                class="btn btn-farm-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#addFertilizerModal"
+                @click="addFertilizer"
+              >
+                <i class="bi bi-plus-circle me-2"></i>新建采购信息
+              </button>
+            </div>
+
+            <!-- 类型选择区域 -->
+            <div class="type-selection-section mb-4">
+              <div class="row align-items-center">
+                <div class="col-md-3">
+                  <label class="form-label-farm">
+                    <i class="bi bi-tags me-1"></i>选择类型：
+                  </label>
+                </div>
+                <div class="col-md-4">
+                  <select
+                    class="form-select form-control-farm"
+                    v-model="fertilizerType"
+                    @change="fertilizerTypeChange"
+                  >
+                    <option
+                      v-for="(type, index) in fertilizerTypeList"
+                      :key="index"
+                      :value="type"
+                    >
+                      {{ type }}
+                    </option>
+                  </select>
                 </div>
               </div>
-              <hr />
-              <br />
-              <table class="table table-borderless">
+            </div>
+
+            <!-- 库存表格 -->
+            <div class="table-responsive">
+              <table class="table table-farm">
                 <thead>
                   <tr>
-                    <th style="text-align: center;" class="text-truncate">
-                      {{ fertilizerType + "名称" }}
+                    <th class="text-center">
+                      <i class="bi bi-tag me-1"></i>{{ fertilizerType }}名称
                     </th>
-                    <th style="text-align: center;" class="text-truncate">
-                      库存
+                    <th class="text-center">
+                      <i class="bi bi-box me-1"></i>当前库存
                     </th>
-                    <th style="text-align: center;" class="text-truncate">
-                      安全库存
+                    <th class="text-center">
+                      <i class="bi bi-shield-check me-1"></i>安全库存
                     </th>
-                    <th style="text-align: center;" class="text-truncate"></th>
-                    <th style="text-align: center;" class="text-truncate"></th>
+                    <th class="text-center">
+                      <i class="bi bi-exclamation-triangle me-1"></i>库存状态
+                    </th>
+                    <th class="text-center">
+                      <i class="bi bi-gear me-1"></i>操作
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr
                     v-for="(fertilizer, index) in fertilizerList"
                     :key="index"
+                    class="table-row-hover"
                   >
-                    <td style="text-align: center;" class="text-truncate">
+                    <td class="text-center fw-bold text-farm-primary">
                       {{ fertilizer.name }}
                     </td>
-                    <td style="text-align: center;" class="text-truncate">
-                      {{ fertilizer.amount + fertilizer.unit }}
+                    <td class="text-center">
+                      <span class="inventory-amount">
+                        {{ fertilizer.amount }}{{ fertilizer.unit }}
+                      </span>
                     </td>
-                    <td style="text-align: center;" class="text-truncate">
-                      {{ fertilizer.safeAmount + fertilizer.unit }}
+                    <td class="text-center">
+                      <span class="safe-amount">
+                        {{ fertilizer.safeAmount }}{{ fertilizer.unit }}
+                      </span>
                     </td>
-                    <td
-                      style="text-align: center;color:red"
-                      class="text-truncate"
-                    >
-                      {{
-                        fertilizer.amount > fertilizer.safeAmount
-                          ? null
-                          : "缺货"
-                      }}
+                    <td class="text-center">
+                      <span
+                        v-if="fertilizer.amount <= fertilizer.safeAmount"
+                        class="badge bg-danger"
+                      >
+                        <i class="bi bi-exclamation-triangle me-1"></i>库存不足
+                      </span>
+                      <span v-else class="badge bg-success">
+                        <i class="bi bi-check-circle me-1"></i>库存充足
+                      </span>
                     </td>
-                    <td>
-                      <input
-                        type="button"
-                        value="采购"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#purchase"
-                        @click="addPurchase(fertilizer)"
-                      />
-                      {{ &nbsp; }}
-                      <input
-                        type="button"
-                        value="异常消耗"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#consumption"
-                        @click="abnormalConsumptionFertilizer(fertilizer)"
-                      />{{ &nbsp; }}
-                      <input
-                        type="button"
-                        value="使用"
-                        class="btn btn-primary"
-                        data-toggle="modal"
-                        data-target="#farmUse"
-                        @click="farmUse(fertilizer)"
-                      />{{ &nbsp; }}
-                      <input
-                        type="button"
-                        value="删除"
-                        class="btn btn-light"
-                        @click="deleteFertilizer(fertilizer)"
-                      />
+                    <td class="text-center">
+                      <div class="btn-group-vertical btn-group-sm" role="group">
+                        <button
+                          type="button"
+                          class="btn btn-farm-primary btn-sm mb-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#purchaseModal"
+                          @click="addPurchase(fertilizer)"
+                        >
+                          <i class="bi bi-cart-plus me-1"></i>采购
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-warning btn-sm mb-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#consumptionModal"
+                          @click="abnormalConsumptionFertilizer(fertilizer)"
+                        >
+                          <i class="bi bi-exclamation-circle me-1"></i>异常消耗
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-farm-success btn-sm mb-1"
+                          data-bs-toggle="modal"
+                          data-bs-target="#farmUseModal"
+                          @click="farmUse(fertilizer)"
+                        >
+                          <i class="bi bi-check-square me-1"></i>使用
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-outline-danger btn-sm"
+                          @click="deleteFertilizer(fertilizer)"
+                        >
+                          <i class="bi bi-trash me-1"></i>删除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr v-if="fertilizerList.length === 0">
+                    <td colspan="5" class="text-center text-muted py-4">
+                      <i class="bi bi-inbox me-2"></i>暂无{{
+                        fertilizerType
+                      }}数据
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <nav aria-label="Page navigation">
-                <ul class="pagination">
-                  <li class="page-item">
-                    <a
+            </div>
+
+            <!-- 分页器 -->
+            <div
+              class="d-flex justify-content-center"
+              v-if="pageBody1.pageList && pageBody1.pageList.length > 1"
+            >
+              <nav aria-label="{{ fertilizerType }}分页">
+                <ul class="pagination pagination-farm">
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === 1 }"
+                  >
+                    <button
+                      type="button"
                       class="page-link"
-                      href="#"
-                      aria-label="Previous"
                       @click="doPage1(1)"
+                      :disabled="pageBody1.page === 1"
                     >
-                      <span aria-hidden="true">&laquo;</span>
-                      <span class="sr-only">Previous</span>
-                    </a>
+                      <i class="bi bi-chevron-double-left"></i>
+                    </button>
                   </li>
                   <li
                     v-for="(page, index) in pageBody1.pageList"
                     :key="index"
-                    :class="
-                      pageBody1.page == page ? 'page-item active' : 'page-item'
-                    "
+                    class="page-item"
+                    :class="{ active: pageBody1.page === page }"
                   >
-                    <a class="page-link" href="#" @click="doPage1(page)">
-                      {{ page }}
-                    </a>
-                  </li>
-                  <li class="page-item">
-                    <a
+                    <button
+                      type="button"
                       class="page-link"
-                      href="#"
-                      aria-label="Next"
-                      @click="doPage1(pageBody1.pages)"
+                      @click="doPage1(page)"
                     >
-                      <span aria-hidden="true">&raquo;</span>
-                      <span class="sr-only">Next</span>
-                    </a>
+                      {{ page }}
+                    </button>
+                  </li>
+                  <li
+                    class="page-item"
+                    :class="{ disabled: pageBody1.page === pageBody1.pages }"
+                  >
+                    <button
+                      type="button"
+                      class="page-link"
+                      @click="doPage1(pageBody1.pages)"
+                      :disabled="pageBody1.page === pageBody1.pages"
+                    >
+                      <i class="bi bi-chevron-double-right"></i>
+                    </button>
                   </li>
                 </ul>
               </nav>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- model -->
+    <!-- 采购模态框 -->
     <div
       class="modal fade"
-      id="purchase"
+      id="purchaseModal"
       tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
+      aria-labelledby="purchaseModalLabel"
       aria-hidden="true"
     >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-farm">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              {{ fertilizerType + "采购" }}
+            <h5 class="modal-title" id="purchaseModalLabel">
+              <i class="bi bi-cart-plus me-2"></i>{{ fertilizerType }}采购
             </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
           </div>
           <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            类型
-                          </span>
-                        </div>
-                        <select
-                          class="form-control"
-                          v-model="fertilizer.fertilizerType"
-                          disabled
-                        >
-                          <option
-                            v-for="(fertilizerType,
-                            index) in fertilizerTypeList"
-                            :key="index"
-                            :value="fertilizerType"
-                          >
-                            {{ fertilizerType }}
-                          </option>
-                        </select>
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            农产品名
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.name"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            采购数量
-                          </span>
-                        </div>
-                        <input
-                          v-model="purchase.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite()"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.unit"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单价
-                          </span>
-                        </div>
-                        <input
-                          v-model="purchase.price"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="priceWrite"
-                        />
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            元
-                          </span>
-                        </div>
-                      </div>
-                      <p style="color: red;">
-                        {{ priceMessage }}
-                      </p>
-                      <br />
-                    </div>
-                  </div>
+            <div class="purchase-form">
+              <div class="mb-3">
+                <label class="form-label-farm"
+                  >{{ fertilizerType }}名称：</label
+                >
+                <input
+                  type="text"
+                  class="form-control form-control-farm"
+                  v-model="purchase.fertilizer.name"
+                  readonly
+                />
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label-farm">采购数量：</label>
+                  <input
+                    type="number"
+                    class="form-control form-control-farm"
+                    v-model="purchase.amount"
+                    min="1"
+                  />
                 </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label-farm">单价：</label>
+                  <input
+                    type="number"
+                    class="form-control form-control-farm"
+                    v-model="purchase.price"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label-farm">供应商：</label>
+                <input
+                  type="text"
+                  class="form-control form-control-farm"
+                  v-model="purchase.supplier"
+                />
               </div>
             </div>
           </div>
           <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="purchaseModel"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- model -->
-    <div
-      class="modal fade"
-      id="consumption"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              {{ fertilizerType + "消耗" }}
-            </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
+              class="btn btn-outline-secondary"
+              data-bs-dismiss="modal"
             >
-              <span aria-hidden="true">&times;</span>
+              <i class="bi bi-x-circle me-2"></i>取消
             </button>
-          </div>
-          <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            类型
-                          </span>
-                        </div>
-                        <select
-                          class="form-control"
-                          v-model="fertilizer.fertilizerType"
-                          disabled
-                        >
-                          <option
-                            v-for="(fertilizerType,
-                            index) in fertilizerTypeList"
-                            :key="index"
-                            :value="fertilizerType"
-                          >
-                            {{ fertilizerType }}
-                          </option>
-                        </select>
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            {{ fertilizerType + "名" }}
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.name"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            异常消耗数量
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.unit"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="consumptionModel"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- model -->
-    <div
-      class="modal fade"
-      id="farmUse"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              {{ fertilizerType + "使用" }}
-            </h5>
             <button
               type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
+              class="btn btn-farm-primary"
+              @click="purchaseModel"
             >
-              <span aria-hidden="true">&times;</span>
+              <i class="bi bi-check-circle me-2"></i>确认采购
             </button>
-          </div>
-          <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            类型
-                          </span>
-                        </div>
-                        <select
-                          class="form-control"
-                          v-model="fertilizer.fertilizerType"
-                          disabled
-                        >
-                          <option
-                            v-for="(fertilizerType,
-                            index) in fertilizerTypeList"
-                            :key="index"
-                            :value="fertilizerType"
-                          >
-                            {{ fertilizerType }}
-                          </option>
-                        </select>
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            {{ fertilizerType + "名" }}
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.name"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            使用数量
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.unit"
-                          disabled
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="farmUseModel"
-              />
-            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- model -->
-    <div
-      class="modal fade"
-      id="addFertilizer"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
-              新建采购信息
-            </h5>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                <div class="form-group text-left">
-                  <div class="row">
-                    <div class="col-lg-12">
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            类型
-                          </span>
-                        </div>
-                        <select
-                          class="form-control"
-                          v-model="fertilizer.fertilizerType"
-                          @change="changeFertilizerType"
-                        >
-                          <option
-                            v-for="(fertilizerType,
-                            index) in fertilizerTypeList"
-                            :key="index"
-                            :value="fertilizerType"
-                          >
-                            {{ fertilizerType }}
-                          </option>
-                        </select>
-                      </div>
-                      <p style="color: red;">
-                        {{ fertilizerTypeMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            {{ fertilizerType + "名" }}
-                          </span>
-                        </div>
-                        <input
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          v-model="fertilizer.name"
-                          @keyup="nameWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ nameMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            库存
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.amount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="amountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ amountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            安全库存
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.safeAmount"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="safeAmountWrite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ safeAmountMessage }}
-                      </p>
-                      <br />
-                      <div class="input-group input-group-lg">
-                        <div class="input-group-prepend">
-                          <span
-                            class="input-group-text"
-                            id="inputGroup-sizing-lg"
-                          >
-                            单位
-                          </span>
-                        </div>
-                        <input
-                          v-model="fertilizer.unit"
-                          type="text"
-                          class="form-control"
-                          aria-label="Sizing example input"
-                          aria-describedby="inputGroup-sizing-lg"
-                          @keyup="unitWtite"
-                        />
-                      </div>
-                      <p style="color: red;">
-                        {{ unitMessge }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div class="col-lg-12" style="text-align:center">
-              <input
-                type="button"
-                value="提交"
-                class="btn btn-primary"
-                @click="addFertilizerModel"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <br />
-    <br />
-    <br />
+    <!-- 页脚 -->
+    <footerNavbar />
   </div>
 </template>
 
 <script>
-import $ from "jquery";
 import bus from "@/util/Bus";
-import {
-  initFertilizer,
-  doPage1,
-  addPurchase1,
-  abnormalConsumptionFertilizer,
-  farmUse,
-  addFertilizer,
-  deleteFertilizer
-} from "@/api/farmStaff.js";
+import { initFertilizer, doPage1, deleteFertilizer } from "@/api/farmStaff";
+import farmStaffNavbar from "@/components/Header/FarmStaffNavbar.vue";
+import footerNavbar from "@/components/FooterNavbar.vue";
 
 export default {
   name: "Fertilizer",
-  data: () => ({
-    fertilizerTypeList: ["饲料", "肥料"],
-    fertilizerType: "饲料",
-    fertilizerList: [],
-    fertilizer: {
-      id: null,
-      name: null,
-      amount: null,
-      safeAmount: null,
-      unit: null,
-      fertilizerType: null
-    },
-    pageBody1: {
-      page: null,
-      pages: null,
-      pageList: []
-    },
-    purchase: {
-      amount: null,
-      price: null,
-      fertilizer: null
-    },
-    nowAmount: null,
-    fertilizerTypeMessage: null,
-    nameMessage: null,
-    amountMessage: null,
-    safeAmountMessage: null,
-    unitMessge: null,
-    priceMessage: null
-  }),
+  components: {
+    farmStaffNavbar,
+    footerNavbar
+  },
+  data() {
+    return {
+      fertilizerType: "肥料",
+      fertilizerTypeList: ["肥料", "饲料"],
+      fertilizerList: [],
+      pageBody1: {
+        page: 1,
+        pages: 1,
+        pageList: []
+      },
+      fertilizer: {
+        id: null,
+        name: null,
+        fertilizerType: null,
+        amount: null,
+        unit: null,
+        safeAmount: null
+      },
+      purchase: {
+        id: null,
+        amount: null,
+        price: null,
+        supplier: null,
+        fertilizer: {
+          id: null,
+          name: null
+        }
+      }
+    };
+  },
   methods: {
-    nameWrite() {
-      this.nameMessage = null;
-    },
-    amountWrite() {
-      this.amountMessage = null;
-    },
-    safeAmountWrite() {
-      this.safeAmountMessage = null;
-    },
-    unitWtite() {
-      this.unitMessge = null;
-    },
-    priceWrite() {
-      this.priceMessage = null;
-    },
-    changeFertilizerType() {
-      this.fertilizerTypeMessage = null;
-    },
     fertilizerTypeChange() {
       initFertilizer(this.fertilizerType);
     },
     doPage1(page) {
-      this.pageBody1.page = page;
-      doPage1(this.pageBody1, this.fertilizerType);
+      doPage1(page, this.fertilizerType);
+    },
+    addFertilizer() {
+      this.fertilizer = {
+        id: null,
+        name: null,
+        fertilizerType: this.fertilizerType,
+        amount: null,
+        unit: null,
+        safeAmount: null
+      };
     },
     addPurchase(fertilizer) {
-      this.amountMessage = null;
-      this.priceMessage = null;
       this.fertilizer = JSON.parse(JSON.stringify(fertilizer));
-      this.purchase.price = null;
-      this.purchase.amount = null;
+      this.purchase = {
+        id: null,
+        amount: null,
+        price: null,
+        supplier: null,
+        fertilizer: {
+          id: fertilizer.id,
+          name: fertilizer.name
+        }
+      };
     },
-    purchaseModel() {
-      if ((this.purchase.amount == null) | (this.purchase.price == null)) {
-        if (this.purchase.amount == null) {
-          this.amountMessage = "请输入采购数量！";
-        }
-        if (this.purchase.price == null) {
-          this.priceMessage = "请输入采购单价！";
-        }
-      } else {
-        let p = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        // let p1 = /^(0|\+?[1-9][0-9]*)$/;
-        if (!p.test(this.purchase.amount) | !p.test(this.purchase.price)) {
-          if (!p.test(this.purchase.amount)) {
-            this.amountMessage = "请输入正数（最高小数点后两位）！";
-          }
-          if (!p.test(this.purchase.price)) {
-            this.priceMessage = "请输入正数（最高小数点后两位）！";
-          }
-        } else {
-          this.purchase.fertilizer = this.fertilizer;
-          addPurchase1(this.purchase);
-          $("#purchase").modal("hide");
-          this.fertilizerType = this.fertilizer.fertilizerType;
-        }
+    deleteFertilizer(fertilizer) {
+      if (confirm(`确定要删除 ${fertilizer.name} 吗？`)) {
+        deleteFertilizer(fertilizer.id, this.fertilizerType);
       }
     },
     abnormalConsumptionFertilizer(fertilizer) {
-      this.nowAmount = fertilizer.amount;
-      this.amountMessage = null;
       this.fertilizer = JSON.parse(JSON.stringify(fertilizer));
-      this.fertilizer.amount = null;
-    },
-    consumptionModel() {
-      if (this.fertilizer.amount == null) {
-        this.amountMessage = "请输入消耗数量！";
-      } else {
-        let p = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (!p.test(this.fertilizer.amount)) {
-          this.amountMessage = "请输入正数（最高小数点后两位）！";
-        } else if (this.fertilizer.amount > this.nowAmount) {
-          this.amountMessage = "库存不足";
-        } else {
-          abnormalConsumptionFertilizer(this.fertilizer);
-          $("#consumption").modal("hide");
-          this.fertilizerType = this.fertilizer.fertilizerType;
-        }
-      }
     },
     farmUse(fertilizer) {
-      this.nowAmount = fertilizer.amount;
-      this.amountMessage = null;
       this.fertilizer = JSON.parse(JSON.stringify(fertilizer));
-      this.fertilizer.amount = null;
     },
-    farmUseModel() {
-      if (this.fertilizer.amount == null) {
-        this.amountMessage = "请输入消耗数量！";
+    purchaseModel() {
+      if (this.purchase.amount && this.purchase.price) {
+        purchaseModel(this.purchase, this.fertilizerType);
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("purchaseModal")
+        );
+        if (modal) modal.hide();
       } else {
-        let p = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (!p.test(this.fertilizer.amount)) {
-          this.amountMessage = "请输入正数（最高小数点后两位）！";
-        } else if (this.fertilizer.amount > this.nowAmount) {
-          this.amountMessage = "库存不足";
-        } else {
-          farmUse(this.fertilizer);
-          $("#farmUse").modal("hide");
-          this.fertilizerType = this.fertilizer.fertilizerType;
-        }
-      }
-    },
-    addFertilizer() {
-      this.fertilizer.id = null;
-      this.fertilizer.name = null;
-      this.fertilizer.amount = null;
-      this.fertilizer.safeAmount = null;
-      this.fertilizer.unit = null;
-      this.fertilizer.fertilizerType = null;
-      this.nameMessage = null;
-      this.amountMessage = null;
-      this.safeAmountMessage = null;
-      this.unitMessge = null;
-      this.fertilizerTypeMessage = null;
-    },
-    addFertilizerModel() {
-      if (
-        this.fertilizer.name == null ||
-        this.fertilizer.amount == null ||
-        this.fertilizer.safeAmount == null ||
-        this.fertilizer.unit == null ||
-        this.fertilizer.fertilizerType == null
-      ) {
-        if (this.fertilizer.name == null) {
-          this.nameMessage = "请输入名称！";
-        }
-        if (this.fertilizer.amount == null) {
-          this.amountMessage = "请输入库存！";
-        }
-        if (this.fertilizer.safeAmount == null) {
-          this.safeAmountMessage = "请输入安全库存！";
-        }
-        if (this.fertilizer.unit == null) {
-          this.unitMessge = "请输入单位！";
-        }
-        if (this.fertilizer.fertilizerType == null) {
-          this.fertilizerTypeMessage = "请选择类型！";
-        }
-      } else {
-        let cn = /^[\u4E00-\u9FA5]+$/;
-        let re = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
-        if (
-          !cn.test(this.fertilizer.name) ||
-          !cn.test(this.fertilizer.unit) ||
-          !re.test(this.fertilizer.amount) ||
-          !re.test(this.fertilizer.safeAmount)
-        ) {
-          if (!cn.test(this.fertilizer.name)) {
-            console.log(this.fertilizer.name);
-
-            this.nameMessage = "请输入中文！";
-          }
-          if (!cn.test(this.fertilizer.unit)) {
-            this.unitMessge = "请输入中文！";
-          }
-          if (!re.test(this.fertilizer.amount)) {
-            this.amountMessage = "请输入正数（最高小数点后两位）！";
-          }
-          if (!re.test(this.fertilizer.safeAmount)) {
-            this.safeAmountMessage = "请输入正数（最高小数点后两位）！";
-          }
-        } else {
-          addFertilizer(this.fertilizer);
-          $("#addFertilizer").modal("hide");
-          this.fertilizerType = this.fertilizer.fertilizerType;
-        }
-      }
-    },
-    deleteFertilizer(fertilizer) {
-      let con = confirm(`是否删除：${fertilizer.name}`);
-      if (con == true) {
-        deleteFertilizer(fertilizer);
+        alert("请填写完整的采购信息");
       }
     }
   },
   created() {
     initFertilizer(this.fertilizerType);
+
     bus.$on(bus.fertilizerList, data => {
-      this.fertilizerList = data;
+      this.fertilizerList = data || [];
     });
     bus.$on(bus.pageBody1, data => {
-      this.pageBody1 = data;
+      this.pageBody1 = data || { page: 1, pages: 1, pageList: [] };
     });
   },
   beforeDestroy() {
@@ -1008,3 +412,82 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.type-selection-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid var(--farm-border-light);
+}
+
+.form-label-farm {
+  font-weight: 600;
+  color: var(--farm-green-dark);
+  margin-bottom: 0.5rem;
+}
+
+.form-control-farm {
+  border: 2px solid var(--farm-border-light);
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control-farm:focus {
+  border-color: var(--farm-green);
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.table-farm thead {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.table-row-hover:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 175, 80, 0.05),
+    rgba(129, 199, 132, 0.05)
+  );
+}
+
+.inventory-amount,
+.safe-amount {
+  font-weight: 600;
+  color: var(--farm-green-dark);
+}
+
+.btn-group-vertical .btn {
+  min-width: 100px;
+}
+
+.modal-farm .modal-header {
+  background: linear-gradient(
+    135deg,
+    var(--farm-green),
+    var(--farm-green-dark)
+  );
+  color: white;
+}
+
+.pagination-farm {
+  --bs-pagination-color: var(--farm-green-dark);
+  --bs-pagination-border-color: var(--farm-border-light);
+  --bs-pagination-hover-color: white;
+  --bs-pagination-hover-bg: var(--farm-green);
+  --bs-pagination-active-bg: var(--farm-green-dark);
+}
+
+@media (max-width: 768px) {
+  .btn-group-vertical .btn {
+    min-width: 80px;
+    font-size: 0.8rem;
+  }
+}
+</style>

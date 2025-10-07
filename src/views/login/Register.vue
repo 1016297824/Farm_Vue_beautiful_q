@@ -1,125 +1,131 @@
-// 用户注册 - 绿色主题
+// 用户注册 - 农场主题
 <template>
   <div>
     <!-- 导航栏 -->
     <loginNavbar />
 
     <!-- 主体 -->
-    <div class="container" style="padding-top: 100px; padding-bottom: 100px;">
+    <div class="container" style="padding-top: 100px; padding-bottom: 120px;">
       <div class="row justify-content-center">
-        <div class="col-lg-5 col-md-6 col-sm-8">
-          <div
-            class="farm-card p-6 transform transition-all duration-500 hover:scale-[1.01]"
-          >
-            <h2 class="farm-title text-center mb-6" style="font-size: 1.8rem;">
-              <i class="fas fa-seedling mr-2"></i>用户注册
-            </h2>
+        <div class="col-lg-4 col-md-5 col-sm-7 col-10">
+          <div class="card-farm p-3">
+            <!-- 表单头部 -->
+            <div class="text-center mb-3">
+              <h3 class="farm-title mb-2">
+                <i class="bi bi-person-plus me-2"></i>用户注册
+              </h3>
+              <p class="text-farm-muted mb-0">加入西塘草舍农场大家庭</p>
+            </div>
 
-            <form @submit.prevent="register" class="space-y-5">
-              <div class="form-group">
-                <label class="block text-left text-gray-700 mb-2 font-medium">
-                  <i class="fas fa-mobile-alt mr-1"></i>手机号
+            <!-- 注册表单 -->
+            <form @submit.prevent="register">
+              <!-- 手机号输入 -->
+              <div class="form-group-farm">
+                <label class="form-label-farm">
+                  <i class="bi bi-phone me-1"></i>手机号
                 </label>
                 <input
                   type="tel"
-                  class="farm-input"
+                  class="form-control form-control-farm"
                   v-model="customer.username"
-                  @keyup="writeUsername"
+                  @input="clearPhoneError"
                   placeholder="请输入手机号码"
                   required
-                  :class="{ 'border-red-500': phoneMessage }"
+                  :class="{ 'is-invalid': phoneMessage }"
                 />
-                <p
-                  v-if="phoneMessage"
-                  class="text-red-500 text-sm mt-1 animate-fadeIn"
-                >
-                  <i class="fas fa-exclamation-circle mr-1"></i
+                <div v-if="phoneMessage" class="invalid-feedback-farm">
+                  <i class="bi bi-exclamation-circle me-1"></i
                   >{{ phoneMessage }}
-                </p>
+                </div>
               </div>
 
-              <div class="form-group">
-                <label class="block text-left text-gray-700 mb-2 font-medium">
-                  <i class="fas fa-user mr-1"></i>姓名
+              <!-- 姓名输入 -->
+              <div class="form-group-farm">
+                <label class="form-label-farm">
+                  <i class="bi bi-person me-1"></i>姓名
                 </label>
                 <input
                   type="text"
-                  class="farm-input"
+                  class="form-control form-control-farm"
                   v-model="customer.name"
-                  @keyup="writeName"
+                  @input="clearNameError"
                   placeholder="请输入真实姓名"
                   required
-                  :class="{ 'border-red-500': nameMessage }"
+                  :class="{ 'is-invalid': nameMessage }"
                 />
-                <p
-                  v-if="nameMessage"
-                  class="text-red-500 text-sm mt-1 animate-fadeIn"
-                >
-                  <i class="fas fa-exclamation-circle mr-1"></i
-                  >{{ nameMessage }}
-                </p>
+                <div v-if="nameMessage" class="invalid-feedback-farm">
+                  <i class="bi bi-exclamation-circle me-1"></i>{{ nameMessage }}
+                </div>
               </div>
 
-              <div class="form-group">
-                <label class="block text-left text-gray-700 mb-2 font-medium">
-                  <i class="fas fa-lock mr-1"></i>密码
+              <!-- 密码输入 -->
+              <div class="form-group-farm">
+                <label class="form-label-farm">
+                  <i class="bi bi-lock me-1"></i>密码
                 </label>
                 <input
                   type="password"
-                  class="farm-input"
+                  class="form-control form-control-farm"
                   v-model="customer.password"
-                  @keyup="writePassword"
+                  @input="clearPasswordError"
                   placeholder="请设置密码（8-20位字符）"
                   required
                   minlength="8"
                   maxlength="20"
-                  :class="{ 'border-red-500': passwordMessage }"
+                  :class="{ 'is-invalid': passwordMessage }"
                 />
-                <p
-                  v-if="passwordMessage"
-                  class="text-red-500 text-sm mt-1 animate-fadeIn"
-                >
-                  <i class="fas fa-exclamation-circle mr-1"></i
+                <div v-if="passwordMessage" class="invalid-feedback-farm">
+                  <i class="bi bi-exclamation-circle me-1"></i
                   >{{ passwordMessage }}
-                </p>
+                </div>
+                <small class="form-text text-muted">密码长度8-20位字符</small>
               </div>
 
-              <div class="form-group">
-                <label class="block text-left text-gray-700 mb-2 font-medium">
-                  <i class="fas fa-lock-open mr-1"></i>确认密码
+              <!-- 确认密码输入 -->
+              <div class="form-group-farm">
+                <label class="form-label-farm">
+                  <i class="bi bi-shield-lock me-1"></i>确认密码
                 </label>
                 <input
                   type="password"
-                  class="farm-input"
+                  class="form-control form-control-farm"
                   v-model="password1"
-                  @keyup="writePassword1"
+                  @input="clearPassword1Error"
                   placeholder="请再次输入密码"
                   required
-                  :class="{ 'border-red-500': password1Message }"
+                  :class="{ 'is-invalid': password1Message }"
                 />
-                <p
-                  v-if="password1Message"
-                  class="text-red-500 text-sm mt-1 animate-fadeIn"
-                >
-                  <i class="fas fa-exclamation-circle mr-1"></i
+                <div v-if="password1Message" class="invalid-feedback-farm">
+                  <i class="bi bi-exclamation-circle me-1"></i
                   >{{ password1Message }}
-                </p>
+                </div>
               </div>
 
-              <div class="text-right">
+              <!-- 注册按钮 -->
+              <div class="d-grid mb-2">
                 <button
                   type="submit"
-                  class="farm-btn farm-btn-primary w-full py-2 font-medium shadow-lg hover:shadow-xl transform transition-all duration-300"
+                  class="btn btn-farm-primary"
+                  :disabled="isSubmitting"
                 >
-                  <i class="fas fa-user-plus mr-2"></i>注册
+                  <span
+                    v-if="isSubmitting"
+                    class="spinner-border spinner-border-sm me-2"
+                  ></span>
+                  <i v-else class="bi bi-person-plus me-2"></i>
+                  {{ isSubmitting ? "注册中..." : "注册" }}
                 </button>
               </div>
 
-              <div class="text-center pt-3">
-                <span class="text-gray-600">已有账号？</span>
-                <a href="/login" class="farm-link ml-1 font-medium">
+              <!-- 登录链接 -->
+              <div class="text-center">
+                <span class="text-farm-muted">已有账号？</span>
+                <router-link
+                  to="/login"
+                  class="text-farm-secondary text-decoration-none fw-medium ms-1"
+                >
                   立即登录
-                </a>
+                </router-link>
               </div>
             </form>
           </div>
@@ -137,114 +143,151 @@ import { register } from "@/api/login.js";
 
 export default {
   name: "Register",
-  data: () => ({
-    customer: {
-      username: null,
-      password: null,
-      name: null
-    },
-    password1: null,
-    phoneMessage: null,
-    passwordMessage: null,
-    password1Message: null,
-    nameMessage: null
-  }),
+  data() {
+    return {
+      customer: {
+        username: "",
+        password: "",
+        name: ""
+      },
+      password1: "",
+      phoneMessage: "",
+      passwordMessage: "",
+      password1Message: "",
+      nameMessage: "",
+      isSubmitting: false
+    };
+  },
   mounted() {
     // 页面加载动画效果
-    document.querySelector(".container").style.opacity = "0";
-    document.querySelector(".container").style.transform = "translateY(20px)";
-    document.querySelector(".container").style.transition = "all 0.6s ease";
-
-    setTimeout(() => {
-      document.querySelector(".container").style.opacity = "1";
-      document.querySelector(".container").style.transform = "translateY(0)";
-    }, 300);
+    this.animatePageEntry();
   },
   methods: {
-    register: function() {
+    async register() {
       // 重置所有错误消息
-      this.phoneMessage = null;
-      this.passwordMessage = null;
-      this.password1Message = null;
-      this.nameMessage = null;
+      this.clearAllErrors();
 
       // 验证表单
+      if (!this.validateForm()) {
+        return;
+      }
+
+      try {
+        this.isSubmitting = true;
+
+        await register(this.customer);
+
+        // 注册成功
+        this.$farmMessage.success("注册成功！欢迎加入西塘草舍农场！");
+
+        // 页面离开动画
+        await this.animatePageExit();
+
+        // 跳转登录页面
+        this.$router.replace("/login");
+      } catch (error) {
+        console.error("注册错误:", error);
+        this.$farmMessage.error("注册失败，请稍后重试");
+      } finally {
+        this.isSubmitting = false;
+      }
+    },
+
+    validateForm() {
+      let isValid = true;
+
+      // 验证手机号
       if (!this.customer.username) {
         this.phoneMessage = "请输入手机号！";
-        return;
+        isValid = false;
+      } else if (!/^1[3-9]\d{9}$/.test(this.customer.username)) {
+        this.phoneMessage = "请输入正确的手机号！";
+        isValid = false;
       }
 
+      // 验证姓名
       if (!this.customer.name) {
         this.nameMessage = "请输入姓名！";
-        return;
+        isValid = false;
+      } else if (!/^[\u4e00-\u9fa5a-zA-Z]{2,10}$/.test(this.customer.name)) {
+        this.nameMessage = "姓名格式不正确！";
+        isValid = false;
       }
 
+      // 验证密码
       if (!this.customer.password) {
         this.passwordMessage = "密码不能为空！";
-        return;
-      }
-
-      if (!this.password1) {
-        this.password1Message = "请再次确认密码！";
-        return;
-      }
-
-      // 验证手机号格式
-      let re = /^1(3|4|5|6|7|8|9)\d{9}$/;
-      if (!re.test(this.customer.username)) {
-        this.phoneMessage = "请输入正确的手机号！";
-        return;
-      }
-
-      // 验证密码长度
-      if (
+        isValid = false;
+      } else if (
         this.customer.password.length < 8 ||
         this.customer.password.length > 20
       ) {
         this.passwordMessage = "密码长度应为8-20位字符！";
-        return;
+        isValid = false;
       }
 
-      // 验证密码一致性
-      if (this.customer.password != this.password1) {
+      // 验证确认密码
+      if (!this.password1) {
+        this.password1Message = "请再次确认密码！";
+        isValid = false;
+      } else if (this.customer.password !== this.password1) {
         this.password1Message = "两次输入密码不一致，请再次确认！";
-        return;
+        isValid = false;
       }
 
-      // 添加注册按钮加载状态
-      const registerButton = document.querySelector('button[type="submit"]');
-      const originalText = registerButton.innerHTML;
-      registerButton.disabled = true;
-      registerButton.innerHTML =
-        '<i class="fas fa-spinner fa-spin mr-2"></i>注册中...';
+      return isValid;
+    },
 
-      // 提交注册请求
-      register(this.customer)
-        .then(() => {
-          // 注册成功后显示成功信息并跳转登录页面
-          alert("注册成功！");
-          this.$router.replace("/login");
-        })
-        .catch(error => {
-          console.error('注册错误:', error);
-          alert('注册失败，请稍后重试');
-          registerButton.disabled = false;
-          registerButton.innerHTML = originalText;
+    clearAllErrors() {
+      this.phoneMessage = "";
+      this.passwordMessage = "";
+      this.password1Message = "";
+      this.nameMessage = "";
+    },
+
+    clearPhoneError() {
+      this.phoneMessage = "";
+    },
+
+    clearPasswordError() {
+      this.passwordMessage = "";
+    },
+
+    clearPassword1Error() {
+      this.password1Message = "";
+    },
+
+    clearNameError() {
+      this.nameMessage = "";
+    },
+
+    animatePageEntry() {
+      const container = document.querySelector(".container");
+      if (container) {
+        container.style.opacity = "0";
+        container.style.transform = "translateY(20px)";
+        container.style.transition = "all 0.6s ease";
+
+        setTimeout(() => {
+          container.style.opacity = "1";
+          container.style.transform = "translateY(0)";
+        }, 100);
+      }
+    },
+
+    async animatePageExit() {
+      const container = document.querySelector(".container");
+      if (container) {
+        container.style.opacity = "0";
+        container.style.transform = "translateY(-20px)";
+
+        return new Promise(resolve => {
+          setTimeout(resolve, 300);
         });
-    },
-    writeUsername: function() {
-      this.phoneMessage = null;
-    },
-    writePassword: function() {
-      this.passwordMessage = null;
-    },
-    writePassword1: function() {
-      this.password1Message = null;
-    },
-    writeName: function() {
-      this.nameMessage = null;
+      }
     }
   },
+
   components: {
     loginNavbar: () => import("@/components/Header/LoginNavbar"),
     footerNavbar: () => import("@/components/FooterNavbar")
@@ -253,56 +296,42 @@ export default {
 </script>
 
 <style scoped>
-/* 表单元素样式 */
-.form-group {
-  position: relative;
+/* 表单动画效果 */
+.card-farm {
+  animation: fadeInUp 0.6s ease;
 }
 
-.space-y-5 > * {
-  margin-bottom: 1.25rem;
+/* 输入框验证状态 */
+.form-control.is-invalid {
+  border-color: var(--bs-danger) !important;
+  box-shadow: 0 0 0 0.2rem rgba(244, 67, 54, 0.15) !important;
 }
 
-/* 动画效果 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out;
+/* 加载按钮状态 */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
   .container {
     padding-top: 80px !important;
-    padding-bottom: 80px !important;
+    padding-bottom: 60px !important;
   }
 
-  .farm-title {
-    font-size: 1.5rem !important;
-  }
-
-  .farm-card {
-    padding: 1.5rem !important;
+  .card-farm {
+    margin: 0 1rem;
   }
 }
 
 @media (max-width: 576px) {
   .container {
     padding-top: 70px !important;
-    padding-bottom: 70px !important;
   }
 
-  .col-sm-8 {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
+  .farm-title {
+    font-size: 1.5rem !important;
   }
 }
 </style>

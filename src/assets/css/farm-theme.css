@@ -1,0 +1,492 @@
+/* ===== 西塘草舍农场管理系统 - 主题样式 ===== */
+
+/* Bootstrap 5 绿色主题定制 */
+:root {
+  /* Bootstrap 主题颜色重定义 */
+  --bs-primary: #4caf50;
+  --bs-primary-rgb: 76, 175, 80;
+  --bs-secondary: #81c784;
+  --bs-secondary-rgb: 129, 199, 132;
+  --bs-success: #66bb6a;
+  --bs-success-rgb: 102, 187, 106;
+  --bs-info: #4fc3f7;
+  --bs-warning: #ff9800;
+  --bs-danger: #f44336;
+  --bs-light: #f1f8e9;
+  --bs-dark: #1b5e20;
+
+  /* 农场主题自定义颜色 */
+  --farm-green-50: #f1f8e9;
+  --farm-green-100: #e8f5e8;
+  --farm-green-200: #c8e6c9;
+  --farm-green-300: #a5d6a7;
+  --farm-green-400: #81c784;
+  --farm-green-500: #4caf50;
+  --farm-green-600: #2e7d32;
+  --farm-green-700: #1b5e20;
+  --farm-green-800: #0e4f1f;
+  --farm-green-900: #0d4318;
+
+  /* 语义化颜色 */
+  --farm-text-primary: #1b5e20;
+  --farm-text-secondary: #388e3c;
+  --farm-text-muted: #757575;
+  --farm-border: #e0e0e0;
+  --farm-shadow: rgba(76, 175, 80, 0.1);
+  --farm-shadow-hover: rgba(76, 175, 80, 0.15);
+
+  /* 渐变定义 */
+  --farm-gradient-primary: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  --farm-gradient-secondary: linear-gradient(135deg, #81c784 0%, #4caf50 100%);
+  --farm-gradient-bg: linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 50%, #dcedc8 100%);
+}
+
+/* ===== 基础样式重置 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  height: 100%;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--farm-text-primary);
+  overflow-x: hidden;
+  background: var(--farm-gradient-bg);
+  background-attachment: fixed;
+}
+
+/* ===== 主布局样式 ===== */
+.bg {
+  min-height: 100vh;
+  background: var(--farm-gradient-bg);
+  background-attachment: fixed;
+  position: relative;
+  padding-bottom: 120px; /* 为固定页脚留出更多空间 */
+}
+
+/* 页面容器样式 - 确保内容不被固定页脚遮挡 */
+.main-content {
+  margin-bottom: 120px;
+}
+
+/* 装饰性背景图案 */
+.bg::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle, var(--farm-green-300) 1px, transparent 1px),
+    radial-gradient(circle, var(--farm-green-400) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: 0 0, 25px 25px;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== 农场主题卡片 ===== */
+.card-farm {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--farm-green-200);
+  border-radius: 1rem;
+  box-shadow: 
+    0 0.125rem 0.25rem rgba(0, 0, 0, 0.075), 
+    0 0.5rem 1rem var(--farm-shadow);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.card-farm:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 0.5rem 1rem rgba(0, 0, 0, 0.15), 
+    0 1rem 2rem var(--farm-shadow-hover);
+  border-color: var(--farm-green-300);
+}
+
+/* ===== 农场主题按钮系统 ===== */
+.btn-farm-primary {
+  background: var(--farm-gradient-primary);
+  border-color: var(--farm-green-500);
+  color: white;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+  border: none;
+  text-transform: none;
+  letter-spacing: 0.025em;
+}
+
+.btn-farm-primary:hover {
+  background: linear-gradient(135deg, var(--farm-green-600) 0%, var(--farm-green-700) 100%);
+  border-color: var(--farm-green-600);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 0.25rem 0.5rem rgba(76, 175, 80, 0.3);
+}
+
+.btn-farm-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 0.125rem 0.25rem rgba(76, 175, 80, 0.2);
+}
+
+.btn-farm-secondary {
+  background: var(--farm-green-100);
+  border-color: var(--farm-green-300);
+  color: var(--farm-green-700);
+  border-radius: 0.75rem;
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-farm-secondary:hover {
+  background: var(--farm-green-200);
+  border-color: var(--farm-green-400);
+  color: var(--farm-green-800);
+  transform: translateY(-1px);
+}
+
+/* 按钮尺寸变体 */
+.btn-farm-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+}
+
+.btn-farm-lg {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+  border-radius: 1rem;
+}
+
+/* ===== 农场主题表单 ===== */
+.form-control-farm {
+  border: 2px solid var(--farm-green-200);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.form-control-farm:focus {
+  border-color: var(--farm-green-500);
+  box-shadow: 0 0 0 0.2rem var(--farm-shadow);
+  background: white;
+  outline: none;
+}
+
+.form-control-farm:invalid {
+  border-color: var(--bs-danger);
+}
+
+.form-label-farm {
+  font-weight: 500;
+  color: var(--farm-green-700);
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.form-group-farm {
+  margin-bottom: 1.5rem;
+}
+
+.invalid-feedback-farm {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--bs-danger);
+  animation: fadeInUp 0.3s ease;
+}
+
+/* ===== 农场主题导航栏 ===== */
+.navbar-farm {
+  background: var(--farm-gradient-primary);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.navbar-brand-farm {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white !important;
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.navbar-brand-farm:hover {
+  opacity: 0.9;
+  color: white !important;
+  text-decoration: none;
+}
+
+/* 农场Logo CSS实现 */
+.farm-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-radius: 0.5rem;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.farm-logo::before {
+  content: "🌱";
+  font-size: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* 导航链接 */
+.navbar-nav-farm .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  margin: 0 0.25rem;
+}
+
+.navbar-nav-farm .nav-link:hover,
+.navbar-nav-farm .nav-link.active {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== 农场主题表格 ===== */
+.table-farm {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  background: white;
+}
+
+.table-farm thead {
+  background: var(--farm-gradient-secondary);
+}
+
+.table-farm thead th {
+  border: none;
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--farm-green-700);
+  font-size: 0.875rem;
+  letter-spacing: 0.025em;
+}
+
+.table-farm tbody td {
+  padding: 1rem;
+  border-top: 1px solid var(--farm-green-100);
+  font-size: 0.875rem;
+  vertical-align: middle;
+}
+
+.table-farm tbody tr:hover {
+  background-color: rgba(200, 230, 201, 0.1);
+}
+
+/* ===== 农场主题标题 ===== */
+.farm-title {
+  color: var(--farm-green-700);
+  font-weight: 700;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.farm-title::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--farm-gradient-primary);
+  border-radius: 2px;
+}
+
+/* ===== 工具类 ===== */
+.text-farm-primary { color: var(--farm-green-700) !important; }
+.text-farm-secondary { color: var(--farm-green-500) !important; }
+.text-farm-success { color: var(--bs-success) !important; }
+.text-farm-muted { color: var(--farm-text-muted) !important; }
+
+.bg-farm-primary { background-color: var(--farm-green-500) !important; }
+.bg-farm-secondary { background-color: var(--farm-green-200) !important; }
+.bg-farm-light { background-color: var(--farm-green-50) !important; }
+
+.border-farm { border-color: var(--farm-green-200) !important; }
+.border-farm-primary { border-color: var(--farm-green-500) !important; }
+
+/* ===== 动画效果 ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.3s ease;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+  
+  .bg::before {
+    background-size: 30px 30px;
+    background-position: 0 0, 15px 15px;
+  }
+  
+  .btn-farm-primary,
+  .btn-farm-secondary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .farm-title::after {
+    width: 40px;
+    bottom: -6px;
+  }
+  
+  .table-farm thead th,
+  .table-farm tbody td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .farm-logo {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .farm-logo::before {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-brand-farm {
+    font-size: 1rem;
+  }
+  
+  .card-farm {
+    border-radius: 0.75rem;
+  }
+  
+  .btn-farm-primary,
+  .btn-farm-secondary {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* ===== Toast 消息样式增强 ===== */
+.toast {
+  border-radius: 0.75rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border: none;
+}
+
+.toast.bg-success {
+  background: var(--farm-gradient-primary) !important;
+}
+
+.toast.bg-danger {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%) !important;
+}
+
+.toast.bg-warning {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%) !important;
+}
+
+.toast.bg-info {
+  background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%) !important;
+}
+
+/* ===== 页面加载和过渡效果 ===== */
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.3s ease;
+}
+
+.page-enter,
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* ===== 可访问性增强 ===== */
+.btn-farm-primary:focus,
+.btn-farm-secondary:focus,
+.form-control-farm:focus {
+  outline: 2px solid var(--farm-green-500);
+  outline-offset: 2px;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+  :root {
+    --farm-green-500: #2e7d32;
+    --farm-green-600: #1b5e20;
+    --farm-green-700: #0d4318;
+  }
+}
+
+/* 减少动画偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
