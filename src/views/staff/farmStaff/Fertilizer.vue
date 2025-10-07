@@ -162,7 +162,7 @@
               class="d-flex justify-content-center"
               v-if="pageBody1.pageList && pageBody1.pageList.length > 1"
             >
-              <nav aria-label="{{ fertilizerType }}分页">
+              <nav :aria-label="fertilizerType + '分页'">
                 <ul class="pagination pagination-farm">
                   <li
                     class="page-item"
@@ -303,7 +303,12 @@
 
 <script>
 import bus from "@/util/Bus";
-import { initFertilizer, doPage1, deleteFertilizer } from "@/api/farmStaff";
+import {
+  initFertilizer,
+  doPage1,
+  deleteFertilizer,
+  addPurchase1
+} from "@/api/farmStaff";
 import farmStaffNavbar from "@/components/Header/FarmStaffNavbar.vue";
 import footerNavbar from "@/components/FooterNavbar.vue";
 
@@ -386,8 +391,8 @@ export default {
     },
     purchaseModel() {
       if (this.purchase.amount && this.purchase.price) {
-        purchaseModel(this.purchase, this.fertilizerType);
-        const modal = bootstrap.Modal.getInstance(
+        addPurchase1(this.purchase);
+        const modal = window.bootstrap.Modal.getInstance(
           document.getElementById("purchaseModal")
         );
         if (modal) modal.hide();
