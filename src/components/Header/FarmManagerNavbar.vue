@@ -26,7 +26,7 @@
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                to="/manager/farmManager/staffShow1"
+                to="/farmManager/staffShow1"
                 :class="{ active: $route.path.includes('staff') }"
               >
                 <i class="bi bi-people me-1"></i>员工管理
@@ -35,7 +35,7 @@
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                to="/manager/farmManager/attendance1"
+                to="/farmManager/attendance1"
                 :class="{ active: $route.path.includes('attendance') }"
               >
                 <i class="bi bi-calendar-check me-1"></i>考勤管理
@@ -44,7 +44,7 @@
             <li class="nav-item">
               <router-link
                 class="nav-link"
-                to="/manager/farmManager/reportForm1"
+                to="/farmManager/reportForm1"
                 :class="{ active: $route.path.includes('report') }"
               >
                 <i class="bi bi-file-earmark-text me-1"></i>报表打印
@@ -65,7 +65,7 @@
                 <li>
                   <router-link
                     class="dropdown-item"
-                    to="/manager/farmManager/passwordFarmManager"
+                    to="/farmManager/passwordFarmManager"
                   >
                     <i class="bi bi-key me-2"></i>修改密码
                   </router-link>

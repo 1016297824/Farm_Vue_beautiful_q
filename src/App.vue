@@ -11,7 +11,7 @@
     <router-view />
 
     <!-- 全局弹窗 -->
-    <alert />
+    <AlertDialog />
   </div>
 </template>
 
@@ -21,7 +21,7 @@ import "@/assets/css/farm-theme.css";
 export default {
   name: "App",
   components: {
-    alert: () => import("@/components/AlertDialog")
+    AlertDialog: () => import("@/components/AlertDialog")
   },
   mounted() {
     // 创建 Toast 容器

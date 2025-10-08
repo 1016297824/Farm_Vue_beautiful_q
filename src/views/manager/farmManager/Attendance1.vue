@@ -204,6 +204,7 @@ import {
 } from "@/api/farmManager.js";
 import farmManagerNavbar from "@/components/Header/FarmManagerNavbar.vue";
 import footerNavbar from "@/components/FooterNavbar.vue";
+import { Toast } from "bootstrap";
 
 export default {
   name: "Attendance1",
@@ -424,7 +425,7 @@ export default {
       toastContainer.appendChild(toast);
 
       // 使用Bootstrap 5 Toast API
-      const bsToast = new bootstrap.Toast(toast, {
+      const bsToast = new Toast(toast, {
         autohide: true,
         delay: 3000
       });
